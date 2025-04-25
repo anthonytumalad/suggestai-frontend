@@ -78,10 +78,10 @@ const FeedbackTable = ({ feedbackData }) => {
   return (
     <div className="flex flex-col">
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-[#C3D3DB] bg-white">
-          <thead>
-            <tr className="bg-[#F5F5F7]">
-              <th className="p-1 w-12">
+        <table className="w-full border-collapse border border-[#C3D3DB] bg-white dark:bg-[#202325] dark:border-[#2f3235]">
+          <thead className=''>
+            <tr className="bg-[#F5F5F7] border-b border-[#C3D3DB] dark:bg-[#1e2022] dark:border-[#2f3235]">
+              <th className="p-1 w-12 ">
                 <input
                   type="checkbox"
                   onChange={() => {
@@ -105,7 +105,7 @@ const FeedbackTable = ({ feedbackData }) => {
           </thead>
           <tbody>
             {paginatedData.map((row) => (
-              <tr key={row.id} className="hover:bg-[#F5F5F7]/50">
+              <tr key={row.id} className="hover:bg-[#F5F5F7]/50 dark:hover:bg-[#2f3235]">
                 <td className="p-5 text-center">
                   <input
                     type="checkbox"
@@ -113,23 +113,24 @@ const FeedbackTable = ({ feedbackData }) => {
                     onChange={() => handleCheckboxChange(row.id)}
                   />
                 </td>
-                <td className="p-3">{row.user}</td>
+                <td className="p-3 dark:text-[#ebf2f5]">{row.user}</td>
                 <td className="p-5 max-w-[370px]">{row.feedback}</td>
                 <td className="p-5">{row.date}</td>
                 <td className="p-5">{getSentimentBadge(row.sentiment)}</td>
                 <td className="p-5">{getTagBadge(row.tag)}</td>
                 <td className="p-5 max-w-[380px]">{row.reply}</td>
                 <td className="p-5 items-center justify-center text-center">
-                    <IconDotsVertical size={16} color="#1B2124" />
+                    <IconDotsVertical size={16} color="#1B2124" className='hover:bg-[#3385F0]/20 hover:text-[#3385F0]'/>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between p-3 bg-[#F5F5F7] border-b border-x border-[#C3D3DB]">
+      <div className="flex items-center justify-between p-3 bg-[#F5F5F7] border-b border-x border-[#C3D3DB]
+      dark:bg-[#1e2022] dark:border-[#2f3235]">
         <div className="flex items-center space-x-2">
-          <span className="text-[14px] tracking-[0.5px] text-[#1B2124]">
+          <span className="text-[14px] tracking-[0.5px] text-[#1B2124] dark:text-[#ebf2f5]">
             Showing {startIndex + 1}-{endIndex} of {totalRows}
           </span>
         </div>

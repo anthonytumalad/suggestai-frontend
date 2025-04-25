@@ -21,7 +21,7 @@ const SideBar = ({ collapsed }) => {
     <div
       className={`fixed top-0 left-0 h-screen ${
         collapsed ? 'w-[80px]' : 'w-[260px]'
-      } bg-white border-r border-[#C3D3DB] text-black z-10 transition-all duration-300`}
+      } bg-white border-r border-y border-[#C3D3DB] text-black z-10 transition-all duration-300 dark:bg-[#202325] dark:border-[#2f3235] dark:text-[#ebf2f5]`}
     >
       <nav className={`${collapsed ? 'items-center' : ''} flex flex-col`}>
         <div className={`${collapsed ? 'justify-center' : ''} flex px-8 mt-3 mb-5`}>
