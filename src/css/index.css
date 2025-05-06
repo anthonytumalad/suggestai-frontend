@@ -2,13 +2,13 @@
 
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
-@plugin "flowbite-react/plugin/tailwindcss";
 
 :root {
   --font-jakarta: 'Plus Jakarta Sans', sans-serif;
   --color-primary: #1B2124;
   --color-secondary: #C3D3DB;
   --color-tertiary: #FF6363;
+  --color-dark-white: #f9fafb;
   --color-background-dark: #1e2022; /* Dark mode background */
 
   --text-xsmall: 14px;
@@ -21,7 +21,8 @@
 
 body {
   font-family: var(--font-jakarta);
-  @apply bg-white dark:bg-[var(--color-background-dark)];
+  background-color: var(--color-dark-white);
+  @apply dark:bg-[var(--color-background-dark)];
 
 }
 

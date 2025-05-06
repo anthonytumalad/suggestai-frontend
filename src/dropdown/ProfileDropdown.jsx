@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { IconUserCircle, IconChevronDown, IconUser, IconSettings, IconLogout } from '@tabler/icons-react';
+import { IconChevronDown, IconUser, IconSettings, IconLogout } from '@tabler/icons-react';
+import Profile from '../assets/images/lebron.webp';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -73,15 +74,15 @@ const ProfileDropdown = () => {
         aria-haspopup="true"
         aria-expanded={isOpen}
       >
-        <IconUserCircle size={35} stroke={1} className='text-[#1B2124] dark:text-[#ebf2f5]'/>
+        {/* <IconUserCircle size={35} stroke={1} className='text-[#1B2124] dark:text-[#ebf2f5]'/> */}
+        <img src={Profile} alt="Profile" className="w-[28px] h-[28px] rounded-sm object-cover"/>
         <div className="flex flex-col text-left">
           <span className="text-[#1B2124] text-[12px] font-medium tracking-normal dark:text-[#ebf2f5]">Administrator</span>
-          <span className="text-[#1B2124] text-[12px] tracking-normal dark:text-[#ebf2f5]">John Doe</span>
+          <span className="text-[#1B2124] text-[12px] tracking-normal dark:text-[#ebf2f5]">Lebron James</span>
         </div>
         <IconChevronDown
           size={16}
-          className="text-[#1B2124] transition-transform duration-200 dark:text-white"  
-          //{`text-[#1B2124] transition-transform duration-200 dark:text-white ${isOpen ? 'rotate-180' : ''`}
+          className={`text-[#1B2124] transition-transform duration-200 dark:text-white ${isOpen && 'rotate-180'}`}
         />
       </button>
 
@@ -93,10 +94,11 @@ const ProfileDropdown = () => {
         >
           <ul className="py-1">
             <li className='flex items-center space-x-2 px-3 py-2 border-b border-[#C3D3DB] dark:border-[#2f3235]'>
-                <IconUserCircle size={35} stroke={1} className='text-[#1B2124] dark:text-[#ebf2f5]' />
+                {/* <IconUserCircle size={35} stroke={1} className='text-[#1B2124] dark:text-[#ebf2f5]' /> */}
+                <img src={Profile} alt="Profile" className="w-[28px] h-[28px] rounded-sm object-cover"/>
                 <div className="flex flex-col text-left">
                     <span className="text-[#1B2124] text-[12px] font-medium tracking-normal dark:text-[#ebf2f5]">Administrator</span>
-                    <span className="text-[#1B2124] text-[12px] tracking-normal dark:text-[#ebf2f5]">John Doe</span>
+                    <span className="text-[#1B2124] text-[12px] tracking-normal dark:text-[#ebf2f5]">Lebron James</span>
                 </div>            
             </li>
             {menuItems.map((item, index) => (

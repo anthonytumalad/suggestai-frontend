@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { IconChevronDown, IconChevronLeft, IconChevronRight, IconDotsVertical } from '@tabler/icons-react';
+import { IconChevronDown, IconChevronLeft, IconChevronRight, IconDotsVertical, IconMoodEmpty } from '@tabler/icons-react';
 
-const FeedbackTable = ({ feedbackData }) => {
-  const [selectedRows, setSelectedRows] = useState([]);
+const FeedbackTable = ({ feedbackData, selectedRows, onCheckboxChange, onSelectAll }) => {
+  // const [selectedRows, setSelectedRows] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -39,7 +39,7 @@ const FeedbackTable = ({ feedbackData }) => {
 
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(Number(event.target.value));
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   const getSentimentBadge = (sentiment) => {
@@ -59,21 +59,6 @@ const FeedbackTable = ({ feedbackData }) => {
     );
   };
 
-  const getTagBadge = (tag) => {
-    const styles = {
-      UI: 'bg-blue-100 text-blue-800',
-      UX: 'bg-purple-100 text-purple-800',
-    };
-    return (
-      <span
-        className={`inline-block px-2 py-1 text-[12px] font-medium rounded-full ${
-          styles[tag] || 'bg-gray-100 text-gray-800'
-        }`}
-      >
-        {tag}
-      </span>
-    );
-  };
 
   return (
     <div className="flex flex-col">
@@ -82,48 +67,57 @@ const FeedbackTable = ({ feedbackData }) => {
           <thead className=''>
             <tr className="bg-[#F5F5F7] border-b border-[#C3D3DB] dark:bg-[#1e2022] dark:border-[#2f3235]">
               <th className="p-1 w-12 ">
-                <input
+              <input
                   type="checkbox"
-                  onChange={() => {
-                    if (selectedRows.length === paginatedData.length) {
-                      setSelectedRows([]);
-                    } else {
-                      setSelectedRows(paginatedData.map((row) => row.id));
-                    }
-                  }}
+                  onChange={() => onSelectAll(paginatedData)}
                   checked={selectedRows.length === paginatedData.length && paginatedData.length > 0}
+                  className='accent-[#3385F0]'
                 />
               </th>
-              <th className="p-3 text-left">STUDENT</th>
-              <th className="p-5 text-left">FEEDBACK</th>
-              <th className="p-5 text-left">DATE</th>
-              <th className="p-5 text-left">SENTIMENT</th>
-              <th className="p-5 text-left">TAG</th>
-              <th className="p-5 text-left">REPLY</th>
-              <th className="p-5 text-center">ACTION</th>
+              <th className="p-3 text-left"><span className='text-[14px] tracking-normal text-[#1B2124] dark:text-[#ebf2f5]'>STUDENT</span></th>
+              <th className="p-5 text-left"><span className='text-[14px] tracking-normal text-[#1B2124] dark:text-[#ebf2f5]'>FEEDBACK</span></th>
+              <th className="p-5 text-left"><span className='text-[14px] tracking-normal text-[#1B2124] dark:text-[#ebf2f5]'>DATE</span></th>
+              <th className="p-5 text-left"><span className='text-[14px] tracking-normal text-[#1B2124] dark:text-[#ebf2f5]'>SENTIMENT</span></th>
+              <th className="p-5 text-left"><span className='text-[14px] tracking-normal text-[#1B2124] dark:text-[#ebf2f5]'>REPLY</span></th>
+              <th className="p-5 text-center"><span className='text-[14px] tracking-normal text-[#1B2124] dark:text-[#ebf2f5]'>ACTION</span></th>
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((row) => (
-              <tr key={row.id} className="hover:bg-[#F5F5F7]/50 dark:hover:bg-[#2f3235]">
-                <td className="p-5 text-center">
-                  <input
-                    type="checkbox"
-                    checked={selectedRows.includes(row.id)}
-                    onChange={() => handleCheckboxChange(row.id)}
-                  />
-                </td>
-                <td className="p-3 dark:text-[#ebf2f5]">{row.user}</td>
-                <td className="p-5 max-w-[370px]">{row.feedback}</td>
-                <td className="p-5">{row.date}</td>
-                <td className="p-5">{getSentimentBadge(row.sentiment)}</td>
-                <td className="p-5">{getTagBadge(row.tag)}</td>
-                <td className="p-5 max-w-[380px]">{row.reply}</td>
-                <td className="p-5 items-center justify-center text-center">
-                    <IconDotsVertical size={16} color="#1B2124" className='hover:bg-[#3385F0]/20 hover:text-[#3385F0]'/>
+          {paginatedData.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="p-5 text-center">
+                  <div className="flex flex-col items-center justify-center py-10">
+                    <IconMoodEmpty size={48} className="text-[#64748B] dark:text-[#ebf2f5] mb-2" />
+                    <span className="text-[14px] text-[#64748B] dark:text-[#ebf2f5]">No Data Found</span>
+                  </div>
                 </td>
               </tr>
-            ))}
+            ) : (
+              paginatedData.map((row) => (
+                <tr
+                key={row.id}
+                className={`transition-colors duration-200 ${
+                  selectedRows.includes(row.id) ? 'bg-[#3385F0]/10 dark:bg-[#3385F0]/10' : 'hover:bg-[#F5F5F7] dark:hover:bg-[#1e2022]'
+                }`}
+              >
+                  <td className="p-5 text-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedRows.includes(row.id)}
+                      onChange={() => onCheckboxChange(row.id)}
+                    />
+                  </td>
+                  <td className="p-3"><span className='text-[#1B2124] dark:text-[#ebf2f5] text-[14px] tracking-wide'>{row.user}</span></td>
+                  <td className="p-5 max-w-[370px]"><span className='text-[#1B2124] dark:text-[#ebf2f5] text-[14px] tracking-wide'>{row.feedback}</span></td>
+                  <td className="p-5"><span className='text-[#1B2124] dark:text-[#ebf2f5] text-[14px] tracking-wide'>{row.date}</span></td>
+                  <td className="p-5"><span className='text-[#1B2124] dark:text-[#ebf2f5] text-[14px] tracking-wide'>{getSentimentBadge(row.sentiment)}</span></td>
+                  <td className="p-5 max-w-[380px]"><span className='text-[#1B2124] dark:text-[#ebf2f5] text-[14px] tracking-wide'>{row.reply}</span></td>
+                  <td className="pl-9">
+                      <IconDotsVertical size={16} stroke={2} className='hover:bg-[#3385F0]/20 hover:text-[#3385F0]'/>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -139,24 +133,24 @@ const FeedbackTable = ({ feedbackData }) => {
             <select
               value={rowsPerPage}
               onChange={handleRowsPerPageChange}
-              className="appearance-none bg-white border border-[#C3D3DB] text-[#1B2124] text-[14px] pl-3 pr-8 py-1 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#3385F0]"
+              className="appearance-none bg-white dark:bg-[#1e2022] dark:text-[#ebf2f5] border border-[#C3D3DB] text-[#1B2124] text-[14px] pl-3 pr-8 py-1 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#3385F0] dark:border-[#2f3235]"
             >
               <option value={10}>10</option>
               <option value={20}>20</option>
               <option value={30}>30</option>
             </select>
             <span className="absolute right-2 top-1/2 -translate-y-1/2">
-              <IconChevronDown size={14} color="#1B2124" />
+              <IconChevronDown size={14} stroke={2} className='text-[#1B2124] dark:text-[#ebf2f5]' />
             </span>
           </div>
           <div className="flex space-x-2">
             <button
               onClick={goToPreviousPage}
               disabled={currentPage === 1}
-              className={`flex items-center tracking-[0.5px] space-x-1 px-2 py-1 border border-[#C3D3DB] rounded-sm text-[14px] ${
+              className={`flex items-center dark:bg-[#1e2022] dark:border-[#2f3235] tracking-[0.5px] space-x-1 px-2 py-1 border border-[#C3D3DB] rounded-sm text-[14px] ${
                 currentPage === 1
-                  ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-[#1B2124] hover:bg-[#3385F0]/20 hover:text-[#3385F0]'
+                  ? 'text-gray-400 bg-[#F5F5F7]/50 cursor-not-allowed'
+                  : 'text-[#1B2124] dark:text-[#ebf2f5] hover:border-[#3385F0] hover:text-[#3385F0]'
               }`}
             >
               <IconChevronLeft size={14} />
@@ -165,10 +159,10 @@ const FeedbackTable = ({ feedbackData }) => {
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
-              className={`flex items-center tracking-[0.5px] space-x-1 px-2 py-1 border border-[#C3D3DB] rounded-sm text-[14px] ${
+              className={`flex items-center dark:bg-[#1e2022] dark:border-[#2f3235] tracking-[0.5px] space-x-1 px-2 py-1 border border-[#C3D3DB] rounded-sm text-[14px] ${
                 currentPage === totalPages
-                  ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-[#1B2124] hover:bg-[#3385F0]/20 hover:text-[#3385F0]'
+                  ? 'text-gray-400 bg-[#F5F5F7]/50 cursor-not-allowed'
+                  : 'text-[#1B2124] dark:text-[#ebf2f5] hover:border-[#3385F0] hover:text-[#3385F0]'
               }`}
             >
               <span>Next</span>
@@ -189,11 +183,13 @@ FeedbackTable.propTypes = {
       feedback: PropTypes.string.isRequired,
       date: PropTypes.string.isRequired,
       sentiment: PropTypes.oneOf(['Negative', 'Good', 'Neutral']).isRequired,
-      tag: PropTypes.oneOf(['UI', 'UX']).isRequired,
       reply: PropTypes.string.isRequired,
       action: PropTypes.string.isRequired,
     })
   ).isRequired,
+  onCheckboxChange: PropTypes.func.isRequired,
+  onSelectAll: PropTypes.func.isRequired,
+
 };
 
 export default FeedbackTable;

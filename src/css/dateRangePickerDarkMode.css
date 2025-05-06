@@ -1,0 +1,115 @@
+/* src/styles/dateRangePickerDarkMode.css */
+
+/* Apply styles only in dark mode */
+@media (prefers-color-scheme: dark) {
+    .rdrCalendarWrapper {
+      background-color: #1e2022;
+      color: #ebf2f5;
+      border: 1px solid #2f3235;
+    }
+  
+    .rdrMonthAndYearWrapper {
+      background-color: #1e2022;
+      color: #ebf2f5;
+    }
+  
+    .rdrMonthAndYearPickers select {
+      background-color: #2f3235;
+      color: #ebf2f5;
+      border: 1px solid #2f3235;
+    }
+  
+    .rdrNextPrevButton {
+      background-color: #2f3235;
+      color: #ebf2f5;
+    }
+  
+    .rdrNextPrevButton:hover {
+      background-color: #3385f0;
+    }
+  
+    .rdrDay {
+      color: #ebf2f5;
+    }
+  
+    .rdrDayNumber {
+      color: #ebf2f5;
+    }
+  
+    .rdrDayPassive .rdrDayNumber span {
+      color: #ebf2f5; /* Muted color for disabled days */
+    }
+  
+    .rdrDayToday .rdrDayNumber span:after {
+      background: #3385f0; /* Highlight for today */
+    }
+  
+    .rdrDayHovered,
+    .rdrDayStartPreview,
+    .rdrDayInPreview,
+    .rdrDayEndPreview {
+      background-color: #2f3235;
+      color: #ebf2f5;
+    }
+  
+    .rdrSelected,
+    .rdrInRange,
+    .rdrStartEdge,
+    .rdrEndEdge {
+      background-color: #3385f0;
+      color: #ebf2f5;
+    }
+  
+    .rdrDayWeekend .rdrDayNumber span {
+      color: #d1d5db; /* Slightly different shade for weekends */
+    }
+  
+    .rdrMonth {
+      background-color: #1e2022;
+    }
+  
+    .rdrDateDisplayWrapper {
+      background-color: #1e2022;
+    }
+  
+    .rdrDateDisplay {
+      color: #ebf2f5;
+    }
+  
+    .rdrDateDisplayItem {
+      background-color: #2f3235;
+      color: #ebf2f5;
+      border: 1px solid #2f3235;
+    }
+  
+    .rdrDateDisplayItemActive {
+      border-color: #3385f0;
+    }
+  }
+  
+  /* Optional: Light mode tweaks to ensure consistency */
+  .rdrCalendarWrapper {
+    background-color: #ffffff;
+    color: #1b2124;
+    border: 1px solid #c3d3db;
+  }
+  
+  .rdrNextPrevButton {
+    background-color: #f5f5f7;
+  }
+  
+  .rdrNextPrevButton:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .rdrDayToday .rdrDayNumber span:after {
+    background: #3385f0;
+  }
+  
+  .rdrSelected,
+  .rdrInRange,
+  .rdrStartEdge,
+  .rdrEndEdge {
+    background-color: #3385f0;
+    color: #ffffff;
+  }

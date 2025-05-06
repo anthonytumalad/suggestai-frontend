@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { IconX } from '@tabler/icons-react';
 
-const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
+const DeleteModal = ({ isOpen, onClose, onConfirm, message }) => {
   const modalRef = useRef(null);
   const cancelButtonRef = useRef(null);
   const [isVisible, setIsVisible] = useState(isOpen);
@@ -69,7 +69,8 @@ const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
             </button>
         </div>
         <p className="mt-5 px-4 text-[15px] text-[#1B2124] tracking-normal dark:text-[#ebf2f5]">
-          Are you sure you want to delete all feedback items? This action cannot be undone.
+          {/* Are you sure you want to delete all feedback items? This action cannot be undone. */}
+          {message}
         </p>
         <div className="mt-8 flex justify-end space-x-2 p-4 border-t border-[#C3D3DB] dark:border-[#2f3235]">
           <button
@@ -95,6 +96,7 @@ DeleteModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
+  message: PropTypes.string.isRequired,
 };
 
 export default DeleteModal;
