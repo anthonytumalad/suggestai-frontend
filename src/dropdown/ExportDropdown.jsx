@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { IconChevronDown, IconDownload, IconFileExcel, IconFileText, IconFileTypePdf } from '@tabler/icons-react';
+import { IconChevronDown, IconDownload, IconFileSpreadsheet, IconFileText, IconFileTypePdf } from '@tabler/icons-react';
 
 const ExportDropdown = ({ onExport }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +54,7 @@ const ExportDropdown = ({ onExport }) => {
             onClick={() => handleExport('excel')}
             className="flex  items-center tracking-normal space-x-2 w-full text-left px-4 py-2 text-[15px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
           >
-            <IconFileExcel size={17} color="#217346" stroke={2} />
+            <IconFileSpreadsheet size={17} color="#217346" stroke={2} />
             <span>Excel</span>
           </button>
           <button
