@@ -40,17 +40,17 @@ const FilterDropdown = () => {
       {/* Filter Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center space-x-2 border text-[#1B2124] px-3 py-2 rounded-sm tracking-normal text-[15px] cursor-pointer ${
-            isOpen ? 'bg-[#F5F5F7] text-[#3385F0] dark:bg-[#1e2022] dark:border-[#3385F0]' : 'hover:bg-[#F5F5F7] dark:bg-[#202325] dark:text-[#ebf2f5] dark:border-[#2f3235] dark:hover:bg-[#1e2022] border-[#C3D3DB]'
+        className={`flex bg-white items-center space-x-2 border text-[#1B2124] px-3 py-[7px] rounded-sm tracking-normal text-[14px] cursor-pointer ${
+            isOpen ? 'bg-white text-[#3385F0] dark:bg-[#1e2022] dark:border-[#3385F0]' : 'hover:bg-[#F5F5F7] dark:bg-[#202325] dark:text-[#ebf2f5] dark:border-[#2f3235] dark:hover:bg-[#1e2022] border-[#e5e7eb]'
         }`}
       >
-        <IconFilter size={16} stroke={2} />
+        <IconFilter size={15} stroke={2} />
         <span>More Filters</span>
       </button>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-80 bg-white border border-[#C3D3DB] rounded-sm shadow-lg dark:bg-[#1e2022] dark:border-[#2f3235] p-3">
+        <div className="absolute z-10 mt-1 w-80 bg-white border border-[#e5e7eb] rounded-sm shadow-md dark:bg-[#1e2022] dark:border-[#2f3235] p-3">
           {/* Column Selection */}
           <div className="mb-3">
             <div className="relative">
@@ -60,7 +60,7 @@ const FilterDropdown = () => {
                   setIsOperatorMenuOpen(false); // Close other menu
                 }}
                 className={`w-full px-3 py-2 border rounded-sm dark:bg-[#1B2124] text-left flex flex-col justify-between ${
-                    isColumnMenuOpen ? 'bg-[#F5F5F7] dark:bg-[#1e2022] border-[#3385F0]' : 'hover:bg-[#F5F5F7] dark:bg-[#202325]  dark:border-[#2f3235] dark:hover:bg-[#1e2022] border-[#C3D3DB]'
+                    isColumnMenuOpen ? 'bg-[#F5F5F7] dark:bg-[#1e2022] border-[#3385F0]' : 'hover:bg-[#F5F5F7] dark:bg-[#202325]  dark:border-[#2f3235] dark:hover:bg-[#1e2022] border-[#e5e7eb]'
                 }`}
               >
                 <span className={`text-[12px] ${
@@ -106,7 +106,7 @@ const FilterDropdown = () => {
                   setIsColumnMenuOpen(false); // Close other menu
                 }}
                 className={`w-full px-3 py-2 border rounded-sm dark:bg-[#1B2124] text-left flex flex-col justify-between ${
-                    isOperatorMenuOpen ? 'bg-[#F5F5F7] dark:bg-[#1e2022] border-[#3385F0]' : 'hover:bg-[#F5F5F7] dark:bg-[#202325]  dark:border-[#2f3235] dark:hover:bg-[#1e2022] border-[#C3D3DB]'
+                    isOperatorMenuOpen ? 'bg-[#F5F5F7] dark:bg-[#1e2022] border-[#3385F0]' : 'hover:bg-[#F5F5F7] dark:bg-[#202325]  dark:border-[#2f3235] dark:hover:bg-[#1e2022] border-[#e5e7eb]'
                 }`}
               >
                 <span className={`text-[12px] ${
@@ -145,7 +145,7 @@ const FilterDropdown = () => {
           {/* Value Input */}
           <div className="relative">
             <div className={`w-full px-3 py-2 border rounded-sm dark:bg-[#1B2124] text-[#1B2124] dark:text-[#ebf2f5] flex flex-col  ${
-                isInputFocused ? 'bg-[#F5F5F7] border-[#3385F0] dark:bg-[#1e2022]' : 'hover:bg-[#F5F5F7] dark:bg-[#202325] dark:hover:bg-[#1e2022] border-[#C3D3DB] dark:border-[#31374a]'
+                isInputFocused ? 'bg-[#F5F5F7] border-[#3385F0] dark:bg-[#1e2022]' : 'hover:bg-[#F5F5F7] dark:bg-[#202325] dark:hover:bg-[#1e2022] border-[#e5e7eb] dark:border-[#31374a]'
             }`}>
                 <span className={`text-[12px] ${isInputFocused ? 'text-[#3385F0]' : 'text-[#1B2124] dark:text-[#ebf2f5]'}`}>
                 Value
