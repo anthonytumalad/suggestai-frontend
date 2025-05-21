@@ -1,9 +1,5 @@
 import {
-  IconHome,
-  IconClipboardList,
-  IconSettings,
-  IconInfoCircle,
-  IconPencil,
+  IconListDetails,
   IconX,
   IconMail,
 } from '@tabler/icons-react';
@@ -14,34 +10,18 @@ const SideBar = ({ isDrawerOpen, onCloseDrawer, onSubSidebarChange }) => {
   const navigate = useNavigate();
 
   const menuItems = [
+
     {
-      label: 'Dashboards',
-      icon: IconHome,
-      path: '/dashboard',
-      subItems: [
-        { label: 'Feedback Overview', path: '/dashboard' },
-        { label: 'Tab 2', path: '/dashboard/tab2' },
-      ],
-    },
-    {
-      label: 'Feedback',
-      icon: IconClipboardList,
+      label: 'All Feeback',
+      icon: IconListDetails,
       path: '/feedback_list',
       subItems: [
-        { label: 'Tab 1', path: '/feedback_list/tab1' },
-        { label: 'Tab 2', path: '/feedback_list/tab2' },
+        { label: 'Overview', path: '/dashboard' },
+        { label: 'List', path: '/feedback_list' },
+        // { label: 'Summarizer', path: '/feedback_summary' },
       ],
     },
-    {
-      label: 'Campaign',
-      icon: IconSettings,
-      path: '/settings',
-    },
-    {
-      label: 'Task',
-      icon: IconInfoCircle,
-      path: '/about',
-    },
+  
   ];
 
   const activeMainItem = menuItems.find(
@@ -69,6 +49,7 @@ const SideBar = ({ isDrawerOpen, onCloseDrawer, onSubSidebarChange }) => {
         {/* Main Sidebar (Icons Only) */}
         <div className="h-screen bg-[#fff] border-r border-[#e5e7eb] text-black dark:bg-[#202325] dark:border-[#2f3235] dark:text-[#ebf2f5] w-[80px]">
           <nav className="flex flex-col h-full items-center">
+<<<<<<< HEAD
             <div className="px-6 mt-5 mb-4">
               <IconPencil size={30} className="text-[#1B2124] dark:text-[#ebf2f5]" />
               
@@ -77,6 +58,16 @@ const SideBar = ({ isDrawerOpen, onCloseDrawer, onSubSidebarChange }) => {
             <ul className="space-y-2 flex-1">
               {menuItems.map((item, index) => (
                 <li key={index} className="relative">
+=======
+            {/* <div className="px-6 mt-5 mb-4">
+              <IconPencil size={30} className="text-[#1B2124] dark:text-[#ebf2f5]" />
+              
+            </div> */}
+
+            <ul className="space-y-2 flex-1 mt-5">
+              {menuItems.map((item, index) => (
+                <li key={index} className="relative group">
+>>>>>>> improvement/dashboard-feedbacklist-ui-modal
                   <NavLink
                     to={item.path}
                     onClick={() => handleMainItemClick(item)}
@@ -106,6 +97,14 @@ const SideBar = ({ isDrawerOpen, onCloseDrawer, onSubSidebarChange }) => {
                       }
                     />
                   </NavLink>
+<<<<<<< HEAD
+=======
+                  <span
+                    className="absolute left-full top-1/2 -translate-y-1/2 ml-1 bg-[#1B2124] text-white dark:bg-[#EBF2F5] dark:text-[#1B2124] text-[12px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-30 whitespace-nowrap"
+                  >
+                    {item.label}
+                  </span>
+>>>>>>> improvement/dashboard-feedbacklist-ui-modal
                 </li>
               ))}
             </ul>
@@ -116,7 +115,11 @@ const SideBar = ({ isDrawerOpen, onCloseDrawer, onSubSidebarChange }) => {
         {isSubSidebarVisible && (
           <div className="h-screen bg-[#f6f8fb] border-r border-[#e5e7eb] dark:border-[#2f3235] dark:text-[#ebf2f5] w-[220px]">
             <nav className="flex flex-col h-full">
+<<<<<<< HEAD
               <div className="px-4 py-5 text-[#3385F0] dark:text-[#ebf2f5] font-medium text-[18px] tracking-wide flex justify-between">
+=======
+              <div className="px-4 py-5 text-[#3385F0] dark:text-[#ebf2f5] font-medium text-[15px] tracking-wide flex justify-between">
+>>>>>>> improvement/dashboard-feedbacklist-ui-modal
                 {activeMainItem.label}
                 {isDrawerOpen && (
                 <button

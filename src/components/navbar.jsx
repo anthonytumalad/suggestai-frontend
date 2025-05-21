@@ -6,7 +6,7 @@ import {
   IconSun,
   IconMaximize,
 } from '@tabler/icons-react';
-import ProfileDropdown from '../dropdown/ProfileDropdown';
+import ProfileDropdown from './dropdown/ProfileDropdown';
 
 const TopNav = ({ isDrawerOpen, onDrawerToggle }) => {
   const [isSunMode, setIsSunMode] = useState(() => {

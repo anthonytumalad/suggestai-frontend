@@ -4,7 +4,7 @@ import { IconChevronDown } from '@tabler/icons-react';
 import { DateRangePicker } from 'react-date-range';
 import 'react-date-range/dist/styles.css'; // Main style file
 import 'react-date-range/dist/theme/default.css'; // Theme CSS file
-import '../css/dateRangePickerDarkMode.css'
+// import '../css/dateRangePickerDarkMode.css'
 import { format, subDays, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 
 const LastDayDropdown = ({ onExport }) => {

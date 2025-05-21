@@ -8,19 +8,28 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import FeedbackTable from '../src/table/FeedbackTable';
-import ExportDropdown from '../src/dropdown/ExportDropdown';
-import LastDayDropdown from '../src/dropdown/LastDaysDropdown';
-import FilterDropdown from '../src/dropdown/FilterDropdown';
+import ExportDropdown from '../src/components/dropdown/ExportDropdown';
+import LastDayDropdown from '../src/components/dropdown/LastDaysDropdown';
+import FilterDropdown from '../src/components/dropdown/FilterDropdown';
 import DeleteModal from '../src/modal/DeleteModal';
 import SummarizeModal from '../src/modal/SummarizeModal';
+import AnalyzeModal from "../src/modal/AnalyzeModal"
+
 
 
 const FeedBackList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSummarizeModalOpen, setIsSummarizeModalOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]); 
+<<<<<<< HEAD
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('summary');
+=======
+  const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('summary');
+  const [analysisHistory, setAnalysisHistory] = useState([]);
+>>>>>>> improvement/dashboard-feedbacklist-ui-modal
   const [feedbackData, setFeedbackData] = useState([
     { id: 1, user: 'John Doe', feedback: 'The Wi-Fi in the library is very slow, especially during peak hours.', date: 'April 15, 2025', sentiment: 'Negative', tag: 'UI', reply: 'The Wi-Fi in the library is very slow, especially during peak hours.', action: 'Web' },
     { id: 2, user: 'Jane Smith', feedback: 'The cafeteria food is not very good. It would be great to have more vegetarian options.', date: 'April 16, 2025', sentiment: 'Negative', tag: 'UX', reply: '-', action: 'Mobile' },
@@ -58,6 +67,15 @@ const FeedBackList = () => {
     setIsModalOpen(true);
   };
 
+  const handleAnalyzeClick = () => {
+    if (selectedRows.length > 0) {
+      setIsAnalyzeModalOpen(true);
+    }
+  };
+  const handleCloseAnalyzeModal = () => {
+    setIsAnalyzeModalOpen(false)
+  };
+
   const handleConfirmDelete = () => {
     setFeedbackData((prev) => prev.filter((item) => !selectedRows.includes(item.id)));
     setSelectedRows([]); 
@@ -91,10 +109,23 @@ const FeedBackList = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
+  // const selectedFeedbackText = feedbackData
+  //   .filter((item) => selectedRows.includes(item.id))
+  //   .map((item) => item.feedback)
+  //   .join('\n\n');
+
   const selectedFeedbackText = feedbackData
-    .filter((item) => selectedRows.includes(item.id))
-    .map((item) => item.feedback)
-    .join('\n\n');
+  .filter((item) => selectedRows.includes(item.id))
+  .map((item) => item.feedback);
+
+  const handleSaveAnalysis = (analysis) => {
+    setAnalysisHistory((prev) => [
+      ...prev,
+      { id: Date.now(), ...analysis },
+    ]);
+    setIsAnalyzeModalOpen(false); // Close modal after saving
+  };
+
 
   return(
     <div className="flex min-h-screen dark:bg-[#1e2022]">
@@ -176,7 +207,10 @@ const FeedBackList = () => {
                 <span>Summarize</span>
               </button>
               <button 
-                className='flex items-center tracking-normal space-x-2 px-3 py-[7px] bg-[#22C55E] text-white rounded-sm hover:bg-[#16A34A] text-[14px] cursor-pointer'
+                onClick={handleAnalyzeClick}
+                disabled={selectedRows.length === 0}
+                className={`flex items-center tracking-normal space-x-2 px-3 py-[7px] rounded-sm text-[14px] text-white transition-colors duration-300 bg-[#22C55E]
+                  ${selectedRows.length === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-[#16A34A] cursor-pointer"}`}
               >
                 <IconSparkles size={15} stroke={2} />
                 <span>Analyze</span>
@@ -201,7 +235,13 @@ const FeedBackList = () => {
          <SummarizeModal
           isOpen={isSummarizeModalOpen}
           onClose={handleCloseSummarizeModal}
+          feedbackText={selectedFeedbackText.join("\n\n")}
+        />
+        <AnalyzeModal
+          isOpen={isAnalyzeModalOpen}
+          onClose={handleCloseAnalyzeModal}
           feedbackText={selectedFeedbackText}
+          onSaveAnalysis={handleSaveAnalysis}
         />
       </div>
       <div
@@ -212,7 +252,7 @@ const FeedBackList = () => {
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b border-[#e5e7eb] dark:border-[#2f3235]">
             <span className="text-[18px] font-semibold text-[#1B2124] dark:text-[#EBF2F5] tracking-normal">
-              History
+              Saved
             </span>
             <button
               onClick={toggleDrawer}
@@ -247,25 +287,31 @@ const FeedBackList = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 p-4 overflow-y-auto">
-            {activeTab === 'summary' ? (
-              <div className="text-[#1B2124] dark:text-[#EBF2F5]">
-                <h3 className="text-[16px] font-semibold mb-2">Summary</h3>
-                <p className="text-[14px]">
-                  This tab will display a summary of feedback history, such as total feedback
-                  received, sentiment breakdown, or common tags. (Placeholder content)
-                </p>
-              </div>
-            ) : (
-              <div className="text-[#1B2124] dark:text-[#EBF2F5]">
-                <h3 className="text-[16px] font-semibold mb-2">Analytics</h3>
-                <p className="text-[14px]">
-                  This tab will show detailed analytics, such as trends over time, feedback
-                  by category, or user-specific metrics. (Placeholder content)
-                </p>
-              </div>
-            )}
-          </div>
+          {activeTab === 'analytics' ? (
+            <div className="text-[#1B2124] dark:text-[#EBF2F5]">
+              <h3 className="text-[16px] font-semibold mb-2">Saved Analyses</h3>
+              {analysisHistory.length === 0 ? (
+                <p className="text-[14px]">No analyses saved yet.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {analysisHistory.map((analysis) => (
+                    <li key={analysis.id} className="text-[14px] p-2 bg-[#F9FAFB] dark:bg-[#1e2022] rounded-md">
+                      <div><strong>Date:</strong> {new Date(analysis.timestamp).toLocaleString()}</div>
+                      <div><strong>Topics:</strong> {analysis.topics.filter(t => t.count > 0).length} identified</div>
+                      <div><strong>Sentiments:</strong> Positive: {analysis.sentiments.Positive.count}, Negative: {analysis.sentiments.Negative.count}, Neutral: {analysis.sentiments.Neutral.count}</div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : (
+            <div className="text-[#1B2124] dark:text-[#EBF2F5]">
+              <h3 className="text-[16px] font-semibold mb-2">Summary</h3>
+              <p className="text-[14px]">
+                Total feedback: {feedbackData.length}, Positive: {feedbackData.filter(f => f.sentiment === 'Good').length}, Negative: {feedbackData.filter(f => f.sentiment === 'Negative').length}
+              </p>
+            </div>
+          )}
         </div>
       </div>
       {isDrawerOpen && (

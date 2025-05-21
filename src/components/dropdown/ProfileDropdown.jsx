@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { IconChevronDown, IconUser, IconSettings, IconLogout } from '@tabler/icons-react';
-import Profile from '../assets/images/lebron.webp';
+import Profile from '../../assets/images/lebron.webp';
 
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
