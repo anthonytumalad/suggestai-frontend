@@ -49,17 +49,17 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, message }) => {
     >
       <div
         ref={modalRef}
-        className={`bg-white rounded-sm border border-[#C3D3DB] shadow-lg w-full max-w-md mx-auto mt-5 relative transition-all duration-300 ease-out transform  dark:bg-[#1e2022] dark:border-[#2f3235] ${
+        className={`bg-white rounded-sm border border-[#e5e7eb] shadow-lg w-full max-w-md mx-auto mt-5 relative transition-all duration-300 ease-out transform  dark:bg-[#1e2022] dark:border-[#2f3235] ${
           isOpen ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'
         }`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        <div className='flex items-center justify-between border-b p-4 border-[#C3D3DB] dark:border-[#2f3235]'>
-            <h2 id="modal-title" className="text-[18px] font-semibold text-[#1B2124] tracking-normal dark:text-[#ebf2f5]">
+        <div className='flex items-center justify-between border-b p-3 border-[#e5e7eb] dark:border-[#2f3235]'>
+            <span id="modal-title" className="text-[15px] font-semibold text-[#1B2124] tracking-normal dark:text-[#ebf2f5]">
                 Confirm Deletion
-            </h2>
+            </span>
             <button
                 onClick={onClose}
                 className=" text-[#1B2124] p-1 cursor-pointer hover:bg-[#F5F5F7] rounded-sm dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
@@ -68,21 +68,21 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, message }) => {
                 <IconX size={20} />
             </button>
         </div>
-        <p className="mt-5 px-4 text-[15px] text-[#1B2124] tracking-normal dark:text-[#ebf2f5]">
+        <p className="mt-5 px-3 text-[15px] text-[#1B2124] tracking-normal dark:text-[#ebf2f5]">
           {/* Are you sure you want to delete all feedback items? This action cannot be undone. */}
           {message}
         </p>
-        <div className="mt-8 flex justify-end space-x-2 p-4 border-t border-[#C3D3DB] dark:border-[#2f3235]">
+        <div className="mt-8 flex justify-end space-x-2 p-3 border-t border-[#e5e7eb] dark:border-[#2f3235]">
           <button
             ref={cancelButtonRef}
             onClick={onClose}
-            className="px-4 py-2 text-[#1B2124] border border-[#C3D3DB] rounded-sm hover:bg-[#F5F5F7] text-[14px] tracking-normal cursor-pointer dark:bg-[#202325] dark:text-[#ebf2f5] dark:border-[#2f3235] dark:hover:bg-[#1e2022]"
+            className="px-3 py-[7px] text-[#1B2124] border border-[#e5e7eb] rounded-sm hover:bg-[#F5F5F7] text-[14px] tracking-normal cursor-pointer dark:bg-[#202325] dark:text-[#ebf2f5] dark:border-[#2f3235] dark:hover:bg-[#1e2022]"
           >
             Cancel
           </button>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-[#FF6363] text-white rounded-sm hover:bg-[#e55a5a] text-[14px] tracking-normal cursor-pointer"
+            className="px-3 py-[7px] bg-[#FF6363] text-white rounded-sm hover:bg-[#e55a5a] text-[14px] tracking-normal cursor-pointer"
           >
             Delete
           </button>

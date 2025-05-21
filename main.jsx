@@ -12,13 +12,12 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Login />} />
       <Route path="/feedback-form" element={<FeedbackForm />} />
      
       <Route element={<Layout />}>
         <Route path="/feedback_list" element={<FeedBackList />} />
         <Route path="/dashboard" element={<Dashboard />} />
-         
       </Route>
       </Routes>
     </BrowserRouter>

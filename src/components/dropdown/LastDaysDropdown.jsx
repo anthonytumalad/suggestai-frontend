@@ -4,7 +4,7 @@ import { IconChevronDown } from '@tabler/icons-react';
 import { DateRangePicker } from 'react-date-range';
 import 'react-date-range/dist/styles.css'; // Main style file
 import 'react-date-range/dist/theme/default.css'; // Theme CSS file
-import '../css/dateRangePickerDarkMode.css'
+// import '../css/dateRangePickerDarkMode.css'
 import { format, subDays, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 
 const LastDayDropdown = ({ onExport }) => {
@@ -94,60 +94,60 @@ const LastDayDropdown = ({ onExport }) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className={`flex items-center space-x-2 border text-[#1B2124] px-3 py-2 rounded-sm tracking-normal text-[15px] cursor-pointer ${
+        className={`flex bg-white  items-center space-x-2 border text-[#1B2124] px-3 py-[7px] rounded-sm tracking-normal text-[14px] cursor-pointer ${
           isOpen
-            ? 'bg-[#F5F5F7] text-[#3385F0] dark:bg-[#1e2022] dark:border-[#3385F0]'
-            : 'hover:bg-[#F5F5F7] dark:bg-[#202325] dark:text-[#ebf2f5] dark:border-[#2f3235] dark:hover:bg-[#1e2022] border-[#C3D3DB]'
+            ? 'bg-white  text-[#3385F0] dark:bg-[#1e2022] dark:border-[#3385F0]'
+            : 'hover:bg-[#F5F5F7] dark:bg-[#202325] dark:text-[#ebf2f5] dark:border-[#2f3235] dark:hover:bg-[#1e2022] border-[#e5e7eb]'
         }`}
       >
         <span>{getDisplayRange()}</span>
         <IconChevronDown
-          size={16}
+          size={13}
           className={`transition-transform duration-200 ${isOpen && 'rotate-180 text-[#3385F0]'}`}
           stroke={2}
         />
       </button>
       {isOpen && (
-        <div className="absolute left-0 mt-1 w-40 bg-white border border-[#C3D3DB] rounded-sm shadow-lg z-10 dark:bg-[#1e2022] dark:border-[#2f3235]">
+        <div className="absolute left-0 mt-1 w-40 bg-white border border-[#e5e7eb] rounded-sm shadow-md z-10 dark:bg-[#1e2022] dark:border-[#2f3235]">
           <button
             onClick={() => handleSelectRange('Today')}
-            className="flex items-center mt-1 tracking-normal space-x-2 w-full text-left px-4 py-2 text-[15px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
+            className="flex items-center mt-1 tracking-normal space-x-2 w-full text-left px-3 py-2 text-[14px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
           >
             <span>Today</span>
           </button>
           <button
             onClick={() => handleSelectRange('Yesterday')}
-            className="flex items-center tracking-normal space-x-2 w-full text-left px-4 py-2 text-[15px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
+            className="flex items-center tracking-normal space-x-2 w-full text-left px-3 py-2 text-[14px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
           >
             <span>Yesterday</span>
           </button>
           <button
             onClick={() => handleSelectRange('Last 7 days')}
-            className="flex items-center tracking-normal space-x-2 w-full text-left px-4 py-2 text-[15px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
+            className="flex items-center tracking-normal space-x-2 w-full text-left px-3 py-2 text-[14px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
           >
             <span>Last 7 days</span>
           </button>
           <button
             onClick={() => handleSelectRange('Last 30 days')}
-            className="flex items-center tracking-normal space-x-2 w-full text-left px-4 py-2 text-[15px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
+            className="flex items-center tracking-normal space-x-2 w-full text-left px-3 py-2 text-[14px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
           >
             <span>Last 30 days</span>
           </button>
           <button
             onClick={() => handleSelectRange('This Month')}
-            className="flex items-center tracking-normal space-x-2 w-full text-left px-4 py-2 text-[15px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
+            className="flex items-center tracking-normal space-x-2 w-full text-left px-3 py-2 text-[14px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
           >
             <span>This Month</span>
           </button>
           <button
             onClick={() => handleSelectRange('Last Month')}
-            className="flex items-center tracking-normal space-x-2 w-full text-left px-4 py-2 text-[15px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
+            className="flex items-center tracking-normal space-x-2 w-full text-left px-3 py-2 text-[14px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
           >
             <span>Last Month</span>
           </button>
           <button
             onClick={handleCustomRangeClick}
-            className="flex items-center mb-1 tracking-normal space-x-2 w-full text-left px-4 py-2 text-[15px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
+            className="flex items-center mb-1 tracking-normal space-x-2 w-full text-left px-3 py-2 text-[14px] text-[#1B2124] hover:bg-[#F5F5F7] dark:text-[#ebf2f5] dark:hover:bg-[#2f3235]"
           >
             <span>Custom Range</span>
           </button>
