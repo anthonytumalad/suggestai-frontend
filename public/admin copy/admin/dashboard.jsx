@@ -4,12 +4,13 @@ import {
   IconTrendingDown,
   IconTrendingUp,
   IconClipboardList,
+  IconReportAnalytics,
   IconRefresh,
   IconSearch,
-  IconMessage,
-  IconStar,
 } from '@tabler/icons-react';
 import {
+  // BarChart,
+  // Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -18,8 +19,8 @@ import {
   PieChart,
   Pie,
   Cell,
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
 } from 'recharts';
 
 // Skeleton Component
@@ -47,12 +48,13 @@ const ChartSkeleton = () => (
   <div className="bg-white dark:bg-[#202325] border border-[#e5e7eb] dark:border-[#2f3235] p-5">
     <div className="flex justify-between items-center mb-4">
       <Skeleton className="h-4 w-40" />
+      {/* <Skeleton className="h-6 w-6 rounded-full" /> */}
     </div>
     <Skeleton className="h-74 w-full" />
   </div>
 );
 
-const Card = ({ title, value, orders, change, icon }) => (
+const Card = ({ title, value, orders, change, icon, sentimentBreakdown }) => (
   <div className="bg-white dark:bg-[#202325] border border-[#e5e7eb] dark:border-[#2f3235] p-5 flex items-start justify-between rounded-sm">
     <div className="flex flex-col">
       <h4 className="text-[#64748B] dark:text-[#A0AEC0] text-[14px] font-medium uppercase tracking-wider">
@@ -62,12 +64,18 @@ const Card = ({ title, value, orders, change, icon }) => (
         <span className="text-[#1B2124] dark:text-[#EBF2F5] text-xl font-semibold">
           {value}
         </span>
+        {title === 'Sentiment' && (
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[#D1FAE5] text-[#10B981]">
+            <IconTrendingUp size={14} stroke={1.5} />
+            Positive
+          </div>
+        )}
       </div>
       <div className="flex flex-wrap items-center">
         {orders && (
           <span className="text-[#64748B] dark:text-[#A0AEC0] text-xs">{orders}</span>
         )}
-        {change !== 0 && (
+        {change !== 0 && title !== 'Sentiment' && (
           <div
             className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
               change > 0 ? 'bg-[#D1FAE5] text-[#10B981]' : 'bg-[#FEE2E2] text-[#EF4444]'
@@ -81,127 +89,50 @@ const Card = ({ title, value, orders, change, icon }) => (
             {Math.abs(change)}%
           </div>
         )}
+        {sentimentBreakdown && (
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[#E5E7EB] text-[#64748B]">
+              {sentimentBreakdown.neutral}% Neutral
+            </div>
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[#FEE2E2] text-[#EF4444]">
+              {sentimentBreakdown.negative}% Negative
+            </div>
+          </div>
+        )}
       </div>
     </div>
     <div className="bg-[#F5F5F7] dark:bg-[#2F3235] rounded-full p-2">{icon}</div>
   </div>
 );
 
-const ChartContainer = ({ title, children, onRefresh, isLoading, filter, setFilter }) => (
+const ChartContainer = ({ title, children, onRefresh, isLoading }) => (
   <div className="bg-white dark:bg-[#202325] border border-[#e5e7eb] dark:border-[#2f3235] rounded-sm p-5">
-    <div className="flex justify-between items-center mb-4">
-      <h4 className="text-[#64748B] text-[14px] font-medium uppercase tracking-wide">
-        {title}
-      </h4>
-      <div className="flex items-center gap-2">
-        {filter && (
-          <div className="flex gap-2">
-            <button
-              className={`px-3 py-1 text-sm rounded-sm ${
-                filter === 'today'
-                  ? 'bg-[#3B82F6] text-white'
-                  : 'bg-[#F5F5F7] dark:bg-[#2F3235] text-[#1B2124] dark:text-[#EBF2F5]'
-              }`}
-              onClick={() => setFilter('today')}
-            >
-              Today
-            </button>
-            <button
-              className={`px-3 py-1 text-sm rounded-sm ${
-                filter === 'weekly'
-                  ? 'bg-[#3B82F6] text-white'
-                  : 'bg-[#F5F5F7] dark:bg-[#2F3235] text-[#1B2124] dark:text-[#EBF2F5]'
-              }`}
-              onClick={() => setFilter('weekly')}
-            >
-              Weekly
-            </button>
-            <button
-              className={`px-3 py-1 text-sm rounded-sm ${
-                filter === 'monthly'
-                  ? 'bg-[#3B82F6] text-white'
-                  : 'bg-[#F5F5F7] dark:bg-[#2F3235] text-[#1B2124] dark:text-[#EBF2F5]'
-              }`}
-              onClick={() => setFilter('monthly')}
-            >
-              Monthly
-            </button>
-          </div>
-        )}
-        {/* {onRefresh && (
-          <button
-            onClick={onRefresh}
-            className="p-2 bg-[#3B82F6] rounded-sm"
-            disabled={isLoading}
-          >
-            <IconRefresh
-              size={17}
-              stroke={1.5}
-              className={`text-white ${isLoading ? 'animate-spin' : ''}`}
-            />
-          </button>
-        )} */}
-      </div>
-    </div>
-    {children}
+    <h4 className="text-[#64748B] text-[14px] font-medium uppercase tracking-wide mb-4">
+      {title}
+    </h4>
+      {children}
   </div>
 );
 
 const Dashboard = () => {
+  // const [chartData, setChartData] = useState([
+  //   { month: 'Jan', ProjectedFeedback: 20, ActualFeedback: 15 },
+  //   { month: 'Feb', ProjectedFeedback: 25, ActualFeedback: 10 },
+  //   { month: 'Mar', ProjectedFeedback: 18, ActualFeedback: 12 },
+  //   { month: 'Apr', ProjectedFeedback: 22, ActualFeedback: 14 },
+  //   { month: 'May', ProjectedFeedback: 30, ActualFeedback: 20 },
+  //   { month: 'Jun', ProjectedFeedback: 15, ActualFeedback: 8 },
+  //   { month: 'Jul', ProjectedFeedback: 12, ActualFeedback: 5 },
+  //   { month: 'Aug', ProjectedFeedback: 28, ActualFeedback: 18 },
+  //   { month: 'Sep', ProjectedFeedback: 10, ActualFeedback: 6 },
+  //   { month: 'Oct', ProjectedFeedback: 16, ActualFeedback: 9 },
+  //   { month: 'Nov', ProjectedFeedback: 8, ActualFeedback: 4 },
+  //   { month: 'Dec', ProjectedFeedback: 20, ActualFeedback: 12 },
+  // ]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [filter, setFilter] = useState('monthly');
 
-  // Bar chart data for feedback frequency (Jan to Dec)
-  const monthlyData = [
-    { month: 'Jan', feedback: 20 },
-    { month: 'Feb', feedback: 25 },
-    { month: 'Mar', feedback: 18 },
-    { month: 'Apr', feedback: 22 },
-    { month: 'May', feedback: 30 },
-    { month: 'Jun', feedback: 15 },
-    { month: 'Jul', feedback: 12 },
-    { month: 'Aug', feedback: 28 },
-    { month: 'Sep', feedback: 10 },
-    { month: 'Oct', feedback: 16 },
-    { month: 'Nov', feedback: 8 },
-    { month: 'Dec', feedback: 20 },
-  ];
 
-  const weeklyData = [
-    { month: 'Jan', feedback: 5 },
-    { month: 'Feb', feedback: 6 },
-    { month: 'Mar', feedback: 4 },
-    { month: 'Apr', feedback: 5 },
-    { month: 'May', feedback: 7 },
-    { month: 'Jun', feedback: 3 },
-    { month: 'Jul', feedback: 2 },
-    { month: 'Aug', feedback: 6 },
-    { month: 'Sep', feedback: 2 },
-    { month: 'Oct', feedback: 4 },
-    { month: 'Nov', feedback: 1 },
-    { month: 'Dec', feedback: 5 },
-  ];
-
-  const todayData = [
-    { month: 'Jan', feedback: 1 },
-    { month: 'Feb', feedback: 2 },
-    { month: 'Mar', feedback: 1 },
-    { month: 'Apr', feedback: 1 },
-    { month: 'May', feedback: 3 },
-    { month: 'Jun', feedback: 0 },
-    { month: 'Jul', feedback: 0 },
-    { month: 'Aug', feedback: 2 },
-    { month: 'Sep', feedback: 0 },
-    { month: 'Oct', feedback: 1 },
-    { month: 'Nov', feedback: 0 },
-    { month: 'Dec', feedback: 1 },
-  ];
-
-  // Select data based on filter
-  const barData = filter === 'today' ? todayData : filter === 'weekly' ? weeklyData : monthlyData;
-
-  // Donut chart data for most frequent topics
   const pieData = [
     { name: 'Wifi Issues', value: 60 },
     { name: 'Library Resources', value: 20 },
@@ -209,14 +140,12 @@ const Dashboard = () => {
     { name: 'Class Schedules', value: 10 },
   ];
 
-  // Sentiment data for progress circles
-  const sentimentData = [
-    { name: 'Positive', value: 50, color: '#10B981' },
-    { name: 'Neutral', value: 30, color: '#64748B' },
-    { name: 'Negative', value: 20, color: '#EF4444' },
-  ];
-
   const COLORS = ['#10B981', '#64748B', '#EF4444', '#3B82F6'];
+  const lineData = [
+    { sentiment: 'Positive', percentage: 50 },
+    { sentiment: 'Neutral', percentage: 30 },
+    { sentiment: 'Negative', percentage: 20 },
+  ];
 
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
     const RADIAN = Math.PI / 180;
@@ -241,6 +170,12 @@ const Dashboard = () => {
   const handleRefresh = () => {
     setIsLoading(true);
     setTimeout(() => {
+      // setChartData((prevData) =>
+      //   prevData.map((item) => ({
+      //     ...item,
+      //     ActualFeedback: Math.floor(Math.random() * 30),
+      //   }))
+      // );
       setIsLoading(false);
     }, 800);
   };
@@ -279,10 +214,10 @@ const Dashboard = () => {
                 }`}
                 onClick={toggleSearch}
               >
-                <IconSearch
-                  size={17}
-                  stroke={1.5}
-                  className={`transition-transform duration-200 ${isSearchOpen && 'text-[#3B82F6]'}`}
+                <IconSearch size={17} stroke={1.5} 
+                  className={`transition-transform duration-200 ${
+                    isSearchOpen && 'text-[#3B82F6]'
+                  }`}
                 />
               </button>
               <button
@@ -293,7 +228,9 @@ const Dashboard = () => {
                 <IconRefresh
                   size={17}
                   stroke={1.5}
-                  className={`text-white ${isLoading ? 'animate-spin' : ''}`}
+                  className={` text-white ${
+                    isLoading ? 'animate-spin' : ''
+                  }`}
                 />
               </button>
             </div>
@@ -314,14 +251,14 @@ const Dashboard = () => {
           )}
         </header>
 
-        <div className="px-3 sm:px-4 md:px-5">
-          <span className="text-[18px] text-[#1B2124] font-semibold tracking-normal">Overview</span>
+        <div className='px-3 sm:px-4 md:px-5'>
+          <span className='text-[18px] text-[#1B2124] font-semibold tracking-normal'>Overview</span>
         </div>
 
         {/* Main Content */}
         <main className="p-3 sm:p-4 md:p-5">
           <div className="w-full flex flex-col gap-4">
-            {/* First Row: Cards */}
+            {/* Row 1: Cards (3 columns) */}
             <div className="w-full">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3">
                 {isLoading
@@ -336,6 +273,12 @@ const Dashboard = () => {
                         icon: <IconClipboardList size={24} stroke={1} color="#1B2124" />,
                       },
                       {
+                        title: 'Sentiment',
+                        value: '60%',
+                        icon: <IconReportAnalytics size={24} stroke={1} color="#1B2124" />,
+                        sentimentBreakdown: { neutral: 30, negative: 10 },
+                      },
+                      {
                         title: 'Recent Feedback',
                         value: '12 Today',
                         orders: '6k orders',
@@ -343,70 +286,43 @@ const Dashboard = () => {
                         icon: <IconPercentage size={24} stroke={1} color="#1B2124" />,
                       },
                       {
-                        title: 'Avg Sentiment',
-                        value: '50%',
-                        change: 2.5,
-                        icon: <IconStar size={24} stroke={1} color="#1B2124" />,
-                      },
-                      {
-                        title: 'Top Issue',
-                        value: 'Wifi Issues',
-                        orders: '60% of feedback',
+                        title: 'Recent Feedback',
+                        value: '12 Today',
+                        orders: '6k orders',
                         change: 0,
-                        icon: <IconMessage size={24} stroke={1} color="#1B2124" />,
+                        icon: <IconPercentage size={24} stroke={1} color="#1B2124" />,
                       },
                     ].map((card, index) => <Card key={index} {...card} />)}
               </div>
             </div>
 
-            {/* Second Row: Sentiment Breakdown + Donut Chart */}
-            <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {/* Sentiment Breakdown */}
-              <div>
-                {isLoading ? (
-                  <ChartSkeleton />
-                ) : (
-                  <ChartContainer title="Sentiment Breakdown">
-                    <div className="flex justify-around items-center h-[300px]">
-                      {sentimentData.map((entry, index) => (
-                        <div key={index} className="flex flex-col items-center">
-                          <div className="relative w-20 h-20">
-                            <svg className="w-full h-full">
-                              <circle
-                                cx="50%"
-                                cy="50%"
-                                r="30"
-                                stroke="#E5E7EB"
-                                strokeWidth="10"
-                                fill="none"
-                              />
-                              <circle
-                                cx="50%"
-                                cy="50%"
-                                r="30"
-                                stroke={entry.color}
-                                strokeWidth="10"
-                                fill="none"
-                                strokeDasharray={`${(entry.value * 2 * Math.PI * 30) / 100} ${
-                                  2 * Math.PI * 30
-                                }`}
-                                strokeDashoffset={0}
-                                transform="rotate(-90, 40, 40)"
-                              />
-                            </svg>
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm font-semibold">
-                              {entry.value}%
-                            </div>
-                          </div>
-                          <span className="text-xs text-[#64748B] mt-2">{entry.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </ChartContainer>
-                )}
-              </div>
+            {/* Row 2: Bar Chart (1 column, full width) */}
+            {/* <div className="w-full">
+              {isLoading ? (
+                <ChartSkeleton />
+              ) : (
+                <ChartContainer
+                  title="Projected vs Actual Feedback Submissions"
+                  onRefresh={handleRefresh}
+                  isLoading={isLoading}
+                >
+                  <ResponsiveContainer width="100%" height={274}>
+                    <BarChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                      <XAxis dataKey="month" stroke="#64748B" />
+                      <YAxis stroke="#64748B" />
+                      <Tooltip />
+                      <Bar dataKey="ProjectedFeedback" fill="#D1D5DB" />
+                      <Bar dataKey="ActualFeedback" fill="#3B82F6" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              )}
+            </div> */}
 
-              {/* Donut Chart: Most Frequent Topics */}
+            {/* Row 3: Pie Chart and Line Chart (2 columns) */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-3">
+              {/* Pie Chart */}
               <div>
                 {isLoading ? (
                   <ChartSkeleton />
@@ -418,8 +334,7 @@ const Dashboard = () => {
                           data={pieData}
                           cx="50%"
                           cy="50%"
-                          innerRadius={80}
-                          outerRadius={100}
+                          outerRadius={120}
                           fill="#8884d8"
                           dataKey="value"
                           label={renderCustomLabel}
@@ -435,34 +350,25 @@ const Dashboard = () => {
                   </ChartContainer>
                 )}
               </div>
-            </div>
 
-            {/* Third Row: Feedback Frequency */}
-            <div className="w-full">
-              {isLoading ? (
-                <ChartSkeleton />
-              ) : (
-                <ChartContainer
-                  title="Feedback Frequency (Jan - Dec)"
-                  onRefresh={handleRefresh}
-                  isLoading={isLoading}
-                  filter={filter}
-                  setFilter={setFilter}
-                >
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart
-                      data={barData}
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="2 2" stroke="#E5E7EB" />
-                      <XAxis dataKey="month" stroke="#64748B" />
-                      <YAxis stroke="#64748B" />
-                      <Tooltip />
-                      <Bar dataKey="feedback" fill="#3B82F6" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              )}
+              {/* Line Chart */}
+              <div>
+                {isLoading ? (
+                  <ChartSkeleton />
+                ) : (
+                  <ChartContainer title="Sentiment Trends">
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={lineData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                        <XAxis dataKey="sentiment" stroke="#64748B" />
+                        <YAxis stroke="#64748B" />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="percentage" stroke="#3B82F6" strokeWidth={2} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                )}
+              </div>
             </div>
           </div>
         </main>

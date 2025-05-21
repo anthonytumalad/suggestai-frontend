@@ -4,12 +4,11 @@ import {
   IconBell,
   IconMoon,
   IconSun,
-  IconSettings,
   IconMaximize,
 } from '@tabler/icons-react';
 import ProfileDropdown from '../dropdown/ProfileDropdown';
 
-const TopNav = ({ isCollapsed, isDrawerOpen, onToggle, onDrawerToggle }) => {
+const TopNav = ({ isDrawerOpen, onDrawerToggle }) => {
   const [isSunMode, setIsSunMode] = useState(() => {
     const savedTheme = localStorage.getItem('theme');
     return savedTheme ? savedTheme === 'light' : true;
@@ -41,7 +40,7 @@ const TopNav = ({ isCollapsed, isDrawerOpen, onToggle, onDrawerToggle }) => {
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch((err) => {
-        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        //console.error(Error attempting to enable fullscreen: ${err.message});
       });
     } else {
       document.exitFullscreen();
@@ -54,17 +53,11 @@ const TopNav = ({ isCollapsed, isDrawerOpen, onToggle, onDrawerToggle }) => {
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 h-14 bg-white border-y border-[#e5e7eb] z-15 flex items-center transition-all duration-300 dark:bg-[#202325] dark:border-[#2f3235] lg:pl-[80px] ${isCollapsed ? 'lg:pl-[80px]' : 'lg:pl-[260px]'}`}
+      className={`fixed top-0 left-0 right-0 h-14 bg-[#f9fafb] border-b border-[#e5e7eb] z-15 flex items-center transition-all duration-300 dark:bg-[#202325] dark:border-[#2f3235]`}
     >
       <div className="flex items-center w-full justify-between px-4">
         <button
-          onClick={() => {
-            if (window.innerWidth < 1024) {
-              onDrawerToggle();
-            } else {
-              onToggle();
-            }
-          }}
+          onClick={onDrawerToggle}
           aria-label="Toggle sidebar"
           className="p-1 hover:bg-[#F5F5F7] rounded-sm dark:hover:bg-[#2f3235] cursor-pointer"
         >
@@ -77,7 +70,6 @@ const TopNav = ({ isCollapsed, isDrawerOpen, onToggle, onDrawerToggle }) => {
 
         <div className="flex items-center space-x-5">
           <div className="items-center space-x-2">
-           
             <button
               onClick={toggleSunMoon}
               aria-label={isSunMode ? 'Switch to moon icon' : 'Switch to sun icon'}

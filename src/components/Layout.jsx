@@ -4,12 +4,8 @@ import TopNav from './navbar';
 import SideBar from './sidebar';
 
 const Layout = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsCollapsed((prev) => !prev);
-  };
+  const [isSubSidebarVisible, setIsSubSidebarVisible] = useState(false);
 
   const toggleDrawer = () => {
     setIsDrawerOpen((prev) => !prev);
@@ -19,23 +15,22 @@ const Layout = () => {
     setIsDrawerOpen(false);
   };
 
+  const handleSubSidebarChange = (visible) => {
+    setIsSubSidebarVisible(visible);
+  };
+
   return (
     <div className="relative min-h-screen">
-      <TopNav
-        isCollapsed={isCollapsed}
-        isDrawerOpen={isDrawerOpen}
-        onToggle={toggleSidebar}
-        onDrawerToggle={toggleDrawer}
-      />
+      <TopNav isDrawerOpen={isDrawerOpen} onDrawerToggle={toggleDrawer} />
       <SideBar
-        collapsed={isCollapsed}
         isDrawerOpen={isDrawerOpen}
         onCloseDrawer={closeDrawer}
+        onSubSidebarChange={handleSubSidebarChange}
       />
       <main
-        className={`transition-all duration-300 pt-16 ${
-          isCollapsed ? 'lg:ml-[80px]' : 'lg:ml-[260px]'
-        }`}
+        className={`transition-all duration-300 pt-[60px] ${
+          isSubSidebarVisible ? 'lg:ml-[300px]' : 'lg:ml-[100px]'
+        } min-h-screen`}
       >
         <Outlet />
       </main>
@@ -44,18 +39,3 @@ const Layout = () => {
 };
 
 export default Layout;
-
-// import { Outlet } from "react-router-dom";
-// import Navbar from "./nav";
-// const Layout = () => {
-//   return (
-//     <div>
-//       <Navbar />
-//       <main>
-//         <Outlet />
-//       </main>
-//     </div>
-//   );
-// };
-
-// export default Layout;

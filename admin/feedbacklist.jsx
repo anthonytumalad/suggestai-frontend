@@ -1,20 +1,26 @@
-import { useState, useRef, useEffect } from 'react';
-import { IconSearch, IconTrash, IconSparkles } from '@tabler/icons-react';
+import { useState } from 'react';
+import {
+  IconSearch,
+  IconTrash,
+  IconClipboardList,
+  IconSparkles,
+  IconHistory,
+  IconX,
+} from '@tabler/icons-react';
 import FeedbackTable from '../src/table/FeedbackTable';
 import ExportDropdown from '../src/dropdown/ExportDropdown';
 import LastDayDropdown from '../src/dropdown/LastDaysDropdown';
-import DeleteModal from '../src/modal/DeleteModal';
 import FilterDropdown from '../src/dropdown/FilterDropdown';
-import Summary from './feedbacksummary';
+import DeleteModal from '../src/modal/DeleteModal';
+import SummarizeModal from '../src/modal/SummarizeModal';
+
 
 const FeedBackList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeMenu, setActiveMenu] = useState('List');
+  const [isSummarizeModalOpen, setIsSummarizeModalOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]); 
-  const menuRefs = useRef({});
-  const containerRef = useRef(null);
-  const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 }); 
-
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('summary');
   const [feedbackData, setFeedbackData] = useState([
     { id: 1, user: 'John Doe', feedback: 'The Wi-Fi in the library is very slow, especially during peak hours.', date: 'April 15, 2025', sentiment: 'Negative', tag: 'UI', reply: 'The Wi-Fi in the library is very slow, especially during peak hours.', action: 'Web' },
     { id: 2, user: 'Jane Smith', feedback: 'The cafeteria food is not very good. It would be great to have more vegetarian options.', date: 'April 16, 2025', sentiment: 'Negative', tag: 'UX', reply: '-', action: 'Mobile' },
@@ -33,16 +39,6 @@ const FeedBackList = () => {
     { id: 15, user: 'Liam Miller', feedback: 'The campus is very safe and secure.', date: 'April 28, 2025', sentiment: 'Good', tag: 'UX', reply: 'The classrooms are too cold. It would be nice to have better temperature control.', action: 'Mobile' },
   ]);
   const [searchQuery, setSearchQuery] = useState('');
-
-
-
-  const menuItems = ['List', 'Summary'];
-
-  const handleExport = (format) => {
-    console.log(`Exporting as ${format}`);
-  };
-
- 
 
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
@@ -67,222 +63,219 @@ const FeedBackList = () => {
     setSelectedRows([]); 
     setIsModalOpen(false);
   };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
-  useEffect(() => {
-    if (activeMenu && menuRefs.current[activeMenu] && containerRef.current) {
-      const menuItem = menuRefs.current[activeMenu];
-      const container = containerRef.current;
-      const { width } = menuItem.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      const menuItemRect = menuItem.getBoundingClientRect();
-      const leftOffset = menuItemRect.left - containerRect.left;
-      setUnderlineStyle({ left: leftOffset, width });
-    }
-  }, [activeMenu]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
 
+  const handleSummarizeClick = () => {
+    setIsSummarizeModalOpen(true);
+  };
+
+  const handleCloseSummarizeModal = () => {
+    setIsSummarizeModalOpen(false);
+  };
+
   const filteredFeedbackData = feedbackData.filter((item) =>
-    item.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.feedback.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.date.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.sentiment.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.tag.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.action.toLowerCase().includes(searchQuery.toLowerCase())
+    ['user', 'feedback', 'date', 'sentiment', 'tag', 'action'].some((key) =>
+      item[key].toLowerCase().includes(searchQuery.toLowerCase())
+    )
   );
 
-  const renderTabContent = () => {
-    switch (activeMenu) {
-      // case 'Overview':
-      //   return <Overview feedbackData={feedbackData} />;
-      case 'List':
-        return (
-          <>
-          <div className="px-4 sm:px-6 lg:px-7 w-full mt-8">
-          <div className="flex items-center justify-between">
-            <div className="flex space-x-2">
-              <div className="relative max-w-lg">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <IconSearch size={20} color="#6B7280" />
-                </span>
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  const selectedFeedbackText = feedbackData
+    .filter((item) => selectedRows.includes(item.id))
+    .map((item) => item.feedback)
+    .join('\n\n');
+
+  return(
+    <div className="flex min-h-screen dark:bg-[#1e2022]">
+      <div className="flex-1">
+        <header className="p-5 border-b border-[#e5e7eb]">
+          <div className='flex items-center justify-between'>
+            <div className='space-y-2.5'>
+              <div className="flex items-center gap-2">
+                <span className="text-[15px] text-[#64748B]">All Feedback</span>
+                <span className="text-[#64748B] text-[15px]">&gt;</span>
+                <span className="font-medium text-[15px] text-[#1B2124]">List</span>
+              </div>
+                <span className='text-[18px] text-[#1B2124] font-semibold tracking-normal'>Feedback list</span>
+            </div>
+            <div className='flex items-center space-x-1'>
+              <ExportDropdown />
+              <button 
+                  onClick={toggleDrawer}
+                  className='px-3 py-[9.5px] bg-white border border-[#e5e7eb] text-[#1B2124] rounded-sm hover:bg-[#F5F5F7] cursor-pointer'
+                >
+                  <IconHistory size={16} stroke={2} />
+              </button>
+            </div>
+          </div>
+        </header>
+        <main className='p-5'>
+          <div className='flex items-center  justify-between'>
+            <div className='flex items-center space-x-1'>
+              <div className="hidden sm:flex relative">
                 <input
                   type="search"
-                  name="search"
-                  id="search"
-                  placeholder="Search ..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={handleSearch}
-                  className="w-full pl-10 pr-4 py-2 bg-[#F5F5F7] border border-[#C3D3DB] rounded-sm focus:outline-none focus:ring-1 tracking-normal focus:ring-[#3385F0] text-[15px] text-[#1B2124] placeholder-gray-400 dark:bg-[#202325] dark:text-[#ebf2f5] dark:border-[#2f3235] dark:placeholder-gray-500"
+                  className="w-64 pl-10 pr-1 py-[7px] text-[14px] border border-[#e5e7eb] dark:border-[#2f3235] bg-white dark:bg-[#202325] text-[#1B2124] dark:text-[#EBF2F5] focus:outline-none focus:ring-1 focus:ring-[#3B82F6] rounded-sm"
                 />
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none rounded-sm">
+                  <IconSearch size={15} stroke={2} className="text-[#1B2124]" />
+                </div>
               </div>
-              <ExportDropdown onExport={handleExport} />
-              <LastDayDropdown  />
-              <FilterDropdown />
+              <div className='flex items-center space-x-1'>
+                <LastDayDropdown />
+                <FilterDropdown />
+              </div> 
             </div>
-            <div className="flex items-center space-x-2">
+            <div className='flex items-center space-x-1'>
               {selectedRows.length > 0 && (
                 <span className="text-[15px] text-[#1B2124] dark:text-[#ebf2f5] mr-4">
                   {selectedRows.length} selected
                 </span>
               )}
-              <button
+              <button 
                 onClick={selectedRows.length > 0 ? handleDeleteClick : undefined}
                 disabled={selectedRows.length === 0}
-                className={`group flex items-center tracking-normal space-x-1 px-3 py-2 border border-[#FF6363] 
-                text-[#FF6363] rounded-sm text-[15px] transition-colors duration-300 ${
-                  selectedRows.length === 0
-                    ? 'opacity-50 cursor-not-allowed'
-                    : isModalOpen
-                    ? 'bg-[#FF6363] text-white'
-                    : 'hover:bg-[#FF6363] cursor-pointer hover:text-white'
-                }`}              >
-                <IconTrash size={16} stroke={2} 
-                  className={`transition-colors duration-300 ${
+                className={`group flex items-center tracking-normal space-x-2 px-3 py-[7px] rounded-sm text-[14px] text-white transition-colors duration-300 bg-[#FF6363] 
+                  ${
                     selectedRows.length === 0
-                      ? 'text-[#FF6363]'
-                      : isModalOpen
-                      ? 'text-white'
-                      : 'text-[#FF6363] group-hover:text-white'
-                  }`}
-                />
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-[#e55a5a] cursor-pointer'
+                  }
+                `}
+              >
+                <IconTrash size={15} stroke={2} />
                 <span>Delete</span>
               </button>
               <button
-                onClick={() => setActiveMenu('Summary')}
-                disabled={selectedRows.length === 0}
-                className={`group flex items-center tracking-normal space-x-1 px-3 py-2 border border-[#3385F0] text-[#3385F0] rounded-sm text-[15px] transition-colors duration-300 ${
-                  selectedRows.length === 0
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:bg-[#3385F0] cursor-pointer hover:text-white'
-                }`}                
-              >
-                <IconSparkles stroke={2} size={16} 
-                  className={`transition-colors duration-300 ${
+                onClick={selectedRows.length > 0 ? handleSummarizeClick : undefined}
+                disabled={selectedRows.length === 0} 
+                className={`flex items-center tracking-normal space-x-2 px-3 py-[7px] rounded-sm 
+                text-[14px] text-white transition-colors duration-300 bg-[#3385F0]
+                  ${
                     selectedRows.length === 0
-                      ? 'text-[#3385F0]'
-                      : 'text-[#3385F0] group-hover:text-white'
-                  }`}                />
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-[#2b73d1] cursor-pointer'
+                  }
+                `}
+              >
+                <IconClipboardList size={15} stroke={2} />
                 <span>Summarize</span>
+              </button>
+              <button 
+                className='flex items-center tracking-normal space-x-2 px-3 py-[7px] bg-[#22C55E] text-white rounded-sm hover:bg-[#16A34A] text-[14px] cursor-pointer'
+              >
+                <IconSparkles size={15} stroke={2} />
+                <span>Analyze</span>
               </button>
             </div>
           </div>
-        </div>
-        <div className="px-7 w-full my-8">
-            {/* <FeedbackTable feedbackData={feedbackData} /> */}
-            <FeedbackTable
-                feedbackData={filteredFeedbackData}
-                selectedRows={selectedRows}
-                onCheckboxChange={handleCheckboxChange}
-                onSelectAll={handleSelectAll}
-              />
-        </div>
-        </>
-        );
-      case 'Summary':
-        const selectedFeedback = feedbackData.filter((item) => selectedRows.includes(item.id));
-        return <Summary feedbackData={selectedFeedback} />;
-      default:
-        return null;      
-    }
-  };
-
-  return (
-    <div className="flex min-h-screen dark:bg-[#1e2022]">
-      <div className="flex-1">
-        <main>
-         <div className="w-full px-7 pt-7 border-b border-[#C3D3DB] dark:border-[#2f3235]">
-            <span className="text-[24px] font-semibold text-[#1B2124] dark:text-[#ebf2f5]">
-              All Feedback
-            </span>
-            <div className="relative flex space-x-8 mt-4" ref={containerRef}>
-              {menuItems.map((item) => (
-                <button
-                  key={item}
-                  ref={(el) => (menuRefs.current[item] = el)} 
-                  onClick={() => setActiveMenu(item)}
-                  className={`py-3 text-[16px] rounded-sm transition-colors duration-200 cursor-pointer ${
-                    activeMenu === item
-                      ? 'text-[#3385F0] font-semibold'
-                      : 'text-[#1B2124] dark:text-[#ebf2f5] hover:text-[#3385F0]'
-                  }`}
-                >
-                  {item}
-                </button>
-              ))}
-              {/* Blue underline for the active tab */}
-              {activeMenu && (
-                <span
-                  className="absolute bottom-0 h-[2px] bg-[#3385F0] transition-all duration-200"
-                  style={{
-                    left: underlineStyle.left,
-                    width: underlineStyle.width,
-                  }}
-                />
-              )}
-            </div>
+          <div className='py-8 w-full'>
+            <FeedbackTable 
+              feedbackData={filteredFeedbackData}
+              selectedRows={selectedRows}
+              onCheckboxChange={handleCheckboxChange}
+              onSelectAll={handleSelectAll} 
+            />
           </div>
-          
-          {/* <div className="px-8 w-full mt-8">
-            <div className="flex items-center justify-between">
-              <div className="flex space-x-2">
-                <div className="relative max-w-lg">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2">
-                    <IconSearch size={20} color="#6B7280" />
-                  </span>
-                  <input
-                    type="search"
-                    name="search"
-                    id="search"
-                    placeholder="Search ..."
-                    className="w-full pl-10 pr-4 py-2 bg-[#F5F5F7] border border-[#C3D3DB] rounded-sm focus:outline-none focus:ring-1 tracking-normal focus:ring-[#3385F0] text-[15px] text-[#1B2124] placeholder-gray-400 dark:bg-[#202325] dark:text-[#ebf2f5] dark:border-[#2f3235] dark:placeholder-gray-500"
-                  />
-                </div>
-                <ExportDropdown onExport={handleExport} />
-                <LastDayDropdown  />
-                <FilterDropdown />
-              </div>
-              <div className="flex items-center space-x-2">
-              
-                <button
-                  onClick={handleDeleteClick}
-                  className="flex items-center tracking-normal space-x-2 px-3 py-2 bg-[#FF6363] text-white rounded-sm hover:bg-[#e55a5a] text-[15px] cursor-pointer"
-                >
-                  <IconTrash size={16} stroke={2} className="text-white" />
-                  <span>Delete</span>
-                </button>
-                <button
-                  className="flex items-center tracking-normal space-x-2 px-3 py-2 bg-[#3385F0] text-white rounded-sm hover:bg-[#2b73d1] text-[15px] cursor-pointer"
-                >
-                  <IconClipboardList stroke={2} size={16} className="text-white" />
-                  <span>Summarize</span>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="px-8 w-full my-8">
-            <FeedbackTable feedbackData={feedbackData} />
-          </div> */}
-
-          {renderTabContent()}
-
-          <DeleteModal
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
-            onConfirm={handleConfirmDelete}
-            message={`Are you sure you want to delete ${selectedRows.length} feedback item${selectedRows.length === 1 ? '' : 's'}? This action cannot be undone.`}
-          />
         </main>
+        <DeleteModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onConfirm={handleConfirmDelete}
+          message={`Are you sure you want to delete ${selectedRows.length} feedback item${selectedRows.length === 1 ? '' : 's'}? This action cannot be undone.`}
+        />
+         <SummarizeModal
+          isOpen={isSummarizeModalOpen}
+          onClose={handleCloseSummarizeModal}
+          feedbackText={selectedFeedbackText}
+        />
       </div>
+      <div
+        className={`fixed top-0 right-0 h-full w-96 bg-white dark:bg-[#202325] shadow-lg transform transition-transform duration-300 ${
+          isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
+        } z-50`}
+      >
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between p-4 border-b border-[#e5e7eb] dark:border-[#2f3235]">
+            <span className="text-[18px] font-semibold text-[#1B2124] dark:text-[#EBF2F5] tracking-normal">
+              History
+            </span>
+            <button
+              onClick={toggleDrawer}
+              className="p-2 text-[#1B2124] dark:text-[#EBF2F5] hover:bg-[#F5F5F7] dark:hover:bg-[#2f3235] rounded-full cursor-pointer"
+            >
+              <IconX size={15} stroke={2} />
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex border-b border-[#e5e7eb] dark:border-[#2f3235]">
+            <button
+              onClick={() => setActiveTab('summary')}
+              className={`flex-1 py-3 text-[14px] text-center cursor-pointer tracking-normal transition-colors duration-200 ${
+                activeTab === 'summary'
+                  ? 'text-[#3385F0] border-b-2 border-[#3385F0] font-medium'
+                  : 'text-[#64748B] hover:text-[#3385F0] dark:hover:text-[#EBF2F5]'
+              }`}
+            >
+              Summary
+            </button>
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`flex-1 py-3 text-[14px] tracking-normal cursor-pointer text-center transition-colors duration-200 ${
+                activeTab === 'analytics'
+                  ? 'text-[#3385F0] border-b-2 border-[#3385F0] font-medium'
+                  : 'text-[#64748B] hover:text-[#3385F0] dark:hover:text-[#EBF2F5]'
+              }`}
+            >
+              Analytics
+            </button>
+          </div>
+
+          {/* Tab Content */}
+          <div className="flex-1 p-4 overflow-y-auto">
+            {activeTab === 'summary' ? (
+              <div className="text-[#1B2124] dark:text-[#EBF2F5]">
+                <h3 className="text-[16px] font-semibold mb-2">Summary</h3>
+                <p className="text-[14px]">
+                  This tab will display a summary of feedback history, such as total feedback
+                  received, sentiment breakdown, or common tags. (Placeholder content)
+                </p>
+              </div>
+            ) : (
+              <div className="text-[#1B2124] dark:text-[#EBF2F5]">
+                <h3 className="text-[16px] font-semibold mb-2">Analytics</h3>
+                <p className="text-[14px]">
+                  This tab will show detailed analytics, such as trends over time, feedback
+                  by category, or user-specific metrics. (Placeholder content)
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      {isDrawerOpen && (
+        <div
+          className="fixed inset-0 bg-black/30  z-40"
+          onClick={toggleDrawer}
+        ></div>
+      )}
     </div>
   );
 };
 
 export default FeedBackList;
-
-
-
