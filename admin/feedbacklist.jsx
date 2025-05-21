@@ -21,15 +21,10 @@ const FeedBackList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSummarizeModalOpen, setIsSummarizeModalOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]); 
-<<<<<<< HEAD
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('summary');
-=======
   const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('summary');
   const [analysisHistory, setAnalysisHistory] = useState([]);
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
   const [feedbackData, setFeedbackData] = useState([
     { id: 1, user: 'John Doe', feedback: 'The Wi-Fi in the library is very slow, especially during peak hours.', date: 'April 15, 2025', sentiment: 'Negative', tag: 'UI', reply: 'The Wi-Fi in the library is very slow, especially during peak hours.', action: 'Web' },
     { id: 2, user: 'Jane Smith', feedback: 'The cafeteria food is not very good. It would be great to have more vegetarian options.', date: 'April 16, 2025', sentiment: 'Negative', tag: 'UX', reply: '-', action: 'Mobile' },

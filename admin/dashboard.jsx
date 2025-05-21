@@ -1,22 +1,11 @@
 import { useState } from 'react';
 import {
-<<<<<<< HEAD
-  IconPercentage,
-  IconTrendingDown,
-  IconTrendingUp,
-  IconClipboardList,
-  IconRefresh,
-  IconSearch,
-  IconMessage,
-  IconStar,
-=======
   IconRefresh,
   IconSearch,
   IconMessageCircle2,
   IconAlertCircle,
   IconThumbUp,
   IconThumbDown,
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
 } from '@tabler/icons-react';
 import {
   XAxis,
@@ -29,13 +18,10 @@ import {
   Cell,
   BarChart,
   Bar,
-<<<<<<< HEAD
-=======
   Legend,
   Line,
   ComposedChart,
   Area,
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
 } from 'recharts';
 
 const Skeleton = ({ className }) => (
@@ -67,38 +53,6 @@ const ChartSkeleton = () => (
   </div>
 );
 
-<<<<<<< HEAD
-const Card = ({ title, value, orders, change, icon }) => (
-  <div className="bg-white dark:bg-[#202325] border border-[#e5e7eb] dark:border-[#2f3235] p-5 flex items-start justify-between rounded-sm">
-    <div className="flex flex-col">
-      <h4 className="text-[#64748B] dark:text-[#A0AEC0] text-[14px] font-medium uppercase tracking-wider">
-        {title}
-      </h4>
-      <div className="flex items-center gap-2">
-        <span className="text-[#1B2124] dark:text-[#EBF2F5] text-xl font-semibold">
-          {value}
-        </span>
-      </div>
-      <div className="flex flex-wrap items-center">
-        {orders && (
-          <span className="text-[#64748B] dark:text-[#A0AEC0] text-xs">{orders}</span>
-        )}
-        {change !== 0 && (
-          <div
-            className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-              change > 0 ? 'bg-[#D1FAE5] text-[#10B981]' : 'bg-[#FEE2E2] text-[#EF4444]'
-            }`}
-          >
-            {change > 0 ? (
-              <IconTrendingUp size={14} stroke={1.5} />
-            ) : (
-              <IconTrendingDown size={14} stroke={1.5} />
-            )}
-            {Math.abs(change)}%
-          </div>
-        )}
-      </div>
-=======
 const Card = ({ title, value, icon, iconBgColor }) => (
   <div 
     className="border border-[#e5e7eb] bg-white dark:border-[#2f3235] p-3.5 flex items-start justify-between rounded-sm"
@@ -110,7 +64,6 @@ const Card = ({ title, value, icon, iconBgColor }) => (
       <h4 className="text-[#1B2124] dark:text-[#A0AEC0] text-[15px] tracking-wide">
         {title}
       </h4>
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
     </div>
     <div className={`p-1.5 rounded-sm ${ iconBgColor }`}>
       {icon}
@@ -119,17 +72,11 @@ const Card = ({ title, value, icon, iconBgColor }) => (
 );
 
 const ChartContainer = ({ title, children, onRefresh, isLoading, filter, setFilter }) => (
-<<<<<<< HEAD
-  <div className="bg-white dark:bg-[#202325] border border-[#e5e7eb] dark:border-[#2f3235] rounded-sm p-5">
-    <div className="flex justify-between items-center mb-4">
-      <h4 className="text-[#64748B] text-[14px] font-medium uppercase tracking-wide">
-=======
   <div 
     className="bg-white dark:bg-[#202325] border border-[#e5e7eb] dark:border-[#2f3235] rounded-sm p-3.5"
   >
     <div className="flex justify-between items-center mb-4">
       <h4 className="text-[#1B2124] text-[15px] tracking-wide">
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
         {title}
       </h4>
       <div className="flex items-center gap-2">
@@ -190,29 +137,10 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [filter, setFilter] = useState('monthly');
-<<<<<<< HEAD
-=======
   const [feedbackTimeRange, setFeedbackTimeRange] = useState("monthly")
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
 
   // Bar chart data for feedback frequency (Jan to Dec)
-  const monthlyData = [
-    { month: 'Jan', feedback: 20 },
-    { month: 'Feb', feedback: 25 },
-    { month: 'Mar', feedback: 18 },
-    { month: 'Apr', feedback: 22 },
-    { month: 'May', feedback: 30 },
-    { month: 'Jun', feedback: 15 },
-    { month: 'Jul', feedback: 12 },
-    { month: 'Aug', feedback: 28 },
-    { month: 'Sep', feedback: 10 },
-    { month: 'Oct', feedback: 16 },
-    { month: 'Nov', feedback: 8 },
-    { month: 'Dec', feedback: 20 },
-  ];
-
-<<<<<<< HEAD
-=======
+ 
   // Topic data for bar chart
   const topicData = [
     { topic: "Wifi Issues", count: 30, average: 4.2 },
@@ -240,7 +168,6 @@ const Dashboard = () => {
     { month: 'Dec', feedback: 20 },
   ];
 
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
   const weeklyData = [
     { month: 'Jan', feedback: 5 },
     { month: 'Feb', feedback: 6 },
@@ -271,8 +198,6 @@ const Dashboard = () => {
     { month: 'Dec', feedback: 1 },
   ];
 
-<<<<<<< HEAD
-=======
 
   const feedbackTrendData = [
     { month: "Jan", total: 45, positive: 25, negative: 10, neutral: 10 },
@@ -289,7 +214,6 @@ const Dashboard = () => {
     { month: "Dec", total: 90, positive: 55, negative: 20, neutral: 15 },
   ]
 
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
   // Select data based on filter
   const barData = filter === 'today' ? todayData : filter === 'weekly' ? weeklyData : monthlyData;
 
@@ -309,18 +233,8 @@ const Dashboard = () => {
     { name: 'Negative', value: 20, color: '#EF4444' },
   ];
 
-<<<<<<< HEAD
-  // Sentiment data for progress circles
-  const sentimentData = [
-    { name: 'Positive', value: 50, color: '#10B981' },
-    { name: 'Neutral', value: 30, color: '#64748B' },
-    { name: 'Negative', value: 20, color: '#EF4444' },
-  ];
-=======
   const COLORS = ['#10B981', '#64748B', '#EF4444', '#3B82F6'];
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
 
-  const COLORS = ['#10B981', '#64748B', '#EF4444', '#3B82F6'];
 
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
     const RADIAN = Math.PI / 180;
@@ -395,13 +309,8 @@ const Dashboard = () => {
                 onClick={toggleSearch}
               >
                 <IconSearch
-<<<<<<< HEAD
-                  size={17}
-                  stroke={1.5}
-=======
                   size={15}
                   stroke={2}
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
                   className={`transition-transform duration-200 ${isSearchOpen && 'text-[#3B82F6]'}`}
                 />
               </button>
@@ -411,13 +320,8 @@ const Dashboard = () => {
                 disabled={isLoading}
               >
                 <IconRefresh
-<<<<<<< HEAD
-                  size={17}
-                  stroke={1.5}
-=======
                   size={15}
                   stroke={2}
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
                   className={`text-white ${isLoading ? 'animate-spin' : ''}`}
                 />
               </button>
@@ -439,21 +343,11 @@ const Dashboard = () => {
           )}
         </header>
 
-<<<<<<< HEAD
-        <div className="px-3 sm:px-4 md:px-5">
-          <span className="text-[18px] text-[#1B2124] font-semibold tracking-normal">Overview</span>
-        </div>
-
-        {/* Main Content */}
-        <main className="p-3 sm:p-4 md:p-5">
-          <div className="w-full flex flex-col gap-4">
-=======
        
 
         {/* Main Content */}
         <main className="p-3 sm:p-4 md:p-5">
           <div className="w-full flex flex-col space-y-5">
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
             {/* First Row: Cards */}
             <div className="w-full">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-3">
@@ -472,26 +366,6 @@ const Dashboard = () => {
                         iconBgColor: 'bg-[#3385F0]',
                       },
                       {
-<<<<<<< HEAD
-                        title: 'Recent Feedback',
-                        value: '12 Today',
-                        orders: '6k orders',
-                        change: 0,
-                        icon: <IconPercentage size={24} stroke={1} color="#1B2124" />,
-                      },
-                      {
-                        title: 'Avg Sentiment',
-                        value: '50%',
-                        change: 2.5,
-                        icon: <IconStar size={24} stroke={1} color="#1B2124" />,
-                      },
-                      {
-                        title: 'Top Issue',
-                        value: 'Wifi Issues',
-                        orders: '60% of feedback',
-                        change: 0,
-                        icon: <IconMessage size={24} stroke={1} color="#1B2124" />,
-=======
                         title: 'Positive Feedback',
                         value: '59%',
                         // percentage: 14.3,
@@ -512,62 +386,11 @@ const Dashboard = () => {
                         // label: 'Most reported issue',
                         icon: <IconAlertCircle size={20} color="#fff" />,
                         iconBgColor: 'bg-yellow-500',
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
                       },
                     ].map((card, index) => <Card key={index} {...card} />)}
               </div>
             </div>
 
-<<<<<<< HEAD
-            {/* Second Row: Sentiment Breakdown + Donut Chart */}
-            <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {/* Sentiment Breakdown */}
-              <div>
-                {isLoading ? (
-                  <ChartSkeleton />
-                ) : (
-                  <ChartContainer title="Sentiment Breakdown">
-                    <div className="flex justify-around items-center h-[300px]">
-                      {sentimentData.map((entry, index) => (
-                        <div key={index} className="flex flex-col items-center">
-                          <div className="relative w-20 h-20">
-                            <svg className="w-full h-full">
-                              <circle
-                                cx="50%"
-                                cy="50%"
-                                r="30"
-                                stroke="#E5E7EB"
-                                strokeWidth="10"
-                                fill="none"
-                              />
-                              <circle
-                                cx="50%"
-                                cy="50%"
-                                r="30"
-                                stroke={entry.color}
-                                strokeWidth="10"
-                                fill="none"
-                                strokeDasharray={`${(entry.value * 2 * Math.PI * 30) / 100} ${
-                                  2 * Math.PI * 30
-                                }`}
-                                strokeDashoffset={0}
-                                transform="rotate(-90, 40, 40)"
-                              />
-                            </svg>
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-sm font-semibold">
-                              {entry.value}%
-                            </div>
-                          </div>
-                          <span className="text-xs text-[#64748B] mt-2">{entry.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </ChartContainer>
-                )}
-              </div>
-
-              {/* Donut Chart: Most Frequent Topics */}
-=======
             <div className="w-full">
              
 
@@ -605,7 +428,6 @@ const Dashboard = () => {
               {/* Sentiment Breakdown */}
             
               <div className='grid grid-cols-1 gap-3'>
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
               <div>
                   {isLoading ? (
                     <ChartSkeleton />
@@ -676,11 +498,7 @@ const Dashboard = () => {
                           data={pieData}
                           cx="50%"
                           cy="50%"
-<<<<<<< HEAD
-                          innerRadius={80}
-=======
                           // innerRadius={80}
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
                           outerRadius={100}
                           fill="#8884d8"
                           dataKey="value"
@@ -697,13 +515,10 @@ const Dashboard = () => {
                   </ChartContainer>
                 )}
               </div>
-<<<<<<< HEAD
-=======
               </div>
 
               {/* Donut Chart: Most Frequent Topics */}
             
->>>>>>> improvement/dashboard-feedbacklist-ui-modal
             </div>
 
             {/* Third Row: Feedback Frequency */}
