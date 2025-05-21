@@ -34,7 +34,7 @@ const LastDayDropdown = ({ onExport }) => {
       }
       case 'Last 30 days': {
         const start = subDays(today, 29);
-        return `${format(start, 'MMM d')} - ${format(today, 'MMM d, yyyy')}`;
+        return`${format(start, 'MMM d')} - ${format(today, 'MMM d, yyyy')}`;
       }
       case 'This Month': {
         const start = startOfMonth(today);
