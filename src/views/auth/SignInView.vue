@@ -7,13 +7,29 @@
           Sign in to TLC-Suggest
         </span>
       </div>
-      <form action="">
+      <form @submit.prevent="handleSignIn">
+        <BaseAlert
+          v-if="signInError"
+          severity="error"
+          :closable="true"
+          :message="signInError.message || 'Sign in failed. Please check your credentials.'"
+          @close="signInError = null"
+          class="mb-4"
+        />
         <div class="flex flex-col space-y-1 mb-2">
           <label for="" class="text-sm text-text-muted">
             Username or email address
           </label>
           <BaseInput
+            id="identity"
+            v-model="credentials.identity"
             size="sm"
+            :disabled="isSigningIn"
+            required
+            :class="{
+              'border-red-500 focus:border-red-600 focus:ring-red-500/30':
+                !!signInError,
+            }"
           />
         </div>
         <div class="flex flex-col space-y-1 mb-6">
@@ -21,9 +37,16 @@
             Password
           </label>
           <BaseInput
+            id="password"
             size="sm"
             :type="showPassword ? 'text' : 'password'"
-            v-model="password"
+            v-model="credentials.password"
+            :disabled="isSigningIn"
+            required
+            :class="{
+              'border-red-500 focus:border-red-600 focus:ring-red-500/30':
+                !!signInError,
+            }"
           />
           <div class="flex items-center space-x-2 pt-2">
             <input
@@ -38,10 +61,13 @@
           </div>
         </div>
         <BaseButton
-          label="Login"
+          type="submit"
+          :label="isSigningIn ? 'Signing in...' : 'Sign in'"
+          :loading="isSigningIn"
           variant="primary"
           class="w-full"
           size="sm"
+          :disabled="isSigningIn"
         />
       </form>
     </div>
@@ -50,7 +76,25 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useAuth } from '@/composables/auth/useAuth'
 
-const password = ref('')
+const { signIn, isSigningIn, signInError } = useAuth()
+
+const credentials = ref({
+  identity: '',
+  password: ''
+})
+
 const showPassword = ref(false)
+
+async function handleSignIn() {
+  signInError.value = null
+
+  try {
+    await signIn(credentials.value)
+  } catch (err) {
+
+    console.error('Sign in failed:', err)
+  }
+}
 </script>
