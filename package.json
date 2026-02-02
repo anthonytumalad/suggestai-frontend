@@ -17,9 +17,12 @@
     "format": "oxfmt src/"
   },
   "dependencies": {
+    "@primeuix/themes": "^2.0.3",
     "@tabler/icons-vue": "^3.36.1",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/vue-query": "^5.92.9",
+    "axios": "^1.13.4",
+    "primevue": "^4.5.4",
     "tailwindcss": "^4.1.18",
     "vue": "^3.5.27",
     "vue-router": "^4.6.4"
