@@ -18,7 +18,7 @@
             :to="{ name: link.name }"
             class="group flex items-center gap-4 px-4 py-2 rounded-lg transition-all duration-300"
             :class="[
-              $route.name === link.name
+              isLinkActive(link.name)
                 ? 'bg-bg-primary text-primary font-medium'
                 : 'text-text-muted hover:bg-bg-primary'
             ]"
@@ -28,7 +28,7 @@
               stroke="2"
               class="w-5 h-5 shrink-0 transition-transform duration-300"
               :class="[
-                $route.name === link.name
+                isLinkActive(link.name)
                   ? 'text-primary'
                   : 'text-text-muted group-hover:text-primary'
               ]"
@@ -53,6 +53,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 import BaseNavbar from '@/components/BaseNavbar.vue'
 import {
   IconHome,
@@ -61,10 +62,12 @@ import {
   IconTrash,
 } from '@tabler/icons-vue'
 
+const route = useRoute()
+
 const items = [
   {
     name: 'dashboard',
-    label: 'Dashboard',
+    label: 'Home',
     icon: IconHome,
   },
   {
@@ -85,4 +88,17 @@ const items = [
 ]
 
 const isCollapsed = ref(false)
+
+const isLinkActive = (linkName: string) => {
+  if (route.name === linkName) {
+    return true
+  }
+
+  if (linkName === 'forms') {
+    const formRoutes = ['formSuggestions', 'formSummary', '']
+    return formRoutes.includes(route.name as string) && route.params.id
+  }
+
+  return false
+}
 </script>

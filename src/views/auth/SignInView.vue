@@ -7,6 +7,16 @@
           Sign in to TLC-Suggest
         </span>
       </div>
+
+       <div class="text-xs text-text-muted flex flex-col space-y-1 mb-4">
+          <span>
+            Email: test@example.com
+          </span>
+          <span>
+            Password: password
+          </span>
+        </div>
+
       <form @submit.prevent="handleSignIn">
         <BaseAlert
           v-if="signInError"
@@ -88,12 +98,12 @@ const credentials = ref({
 const showPassword = ref(false)
 
 async function handleSignIn() {
-  signInError.value = null
-
   try {
     await signIn(credentials.value)
-  } catch (err) {
 
+    console.log('✅ Login successful, redirecting...')
+    console.log('✅ Token:', localStorage.getItem('token'))
+  } catch (err) {
     console.error('Sign in failed:', err)
   }
 }

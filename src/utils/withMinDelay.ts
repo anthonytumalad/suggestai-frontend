@@ -3,7 +3,7 @@ export const sleep = (ms: number) =>
 
 export async function withMinDelay<T>(
   promise: Promise<T>,
-  minMs = 600
+  minMs = 300
 ): Promise<T> {
   const start = Date.now()
 

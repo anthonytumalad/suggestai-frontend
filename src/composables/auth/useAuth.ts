@@ -5,7 +5,6 @@ import {
   authService,
   type AuthenticationError,
   type SigninCredentials,
-  type User
 } from '@/services/authService'
 
 export const AUTH_QUERY_KEYS = {
