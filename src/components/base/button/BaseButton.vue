@@ -8,9 +8,9 @@
 
      <component v-else-if="props.icon" :is="props.icon" class="mr-2 h-5 w-5" />
 
-      <span v-if="props.label"><slot>{{ props.label }}</slot></span>
+     <span v-if="props.label"><slot>{{ props.label }}</slot></span>
 
-      <slot v-else />
+    <slot v-else />
   </button>
 </template>
 
@@ -50,20 +50,34 @@ const sizeClasses = computed(() => {
 const variantClasses = computed(() => {
   switch (props.variant) {
     case 'secondary':
-      return 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+      return 'bg-gray-200 text-gray-800'
     case 'outline':
-      return 'border border-gray-400 text-gray-800 hover:bg-gray-100'
+      return 'border border-border-muted text-text-base'
     default:
-      return 'bg-primary text-white hover:opacity-80'
+      return 'bg-primary text-white'
+  }
+})
+
+const hoverClasses = computed(() => {
+  if (props.disabled || props.loading) return ''
+
+  switch (props.variant) {
+    case 'secondary':
+      return 'hover:bg-gray-300'
+    case 'outline':
+      return 'hover:text-primary'
+    default:
+      return 'hover:opacity-80'
   }
 })
 
 const buttonClasses = computed(() => {
   return [
-    'inline-flex items-center justify-center cursor-pointer rounded transition duration-300',
+    'inline-flex items-center justify-center rounded transition duration-300',
     sizeClasses.value,
     variantClasses.value,
-    props.disabled ? 'opacity-50 cursor-not-allowed' : ''
+     hoverClasses.value,
+    props.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer '
   ].filter(Boolean).join(' ')
 })
 </script>

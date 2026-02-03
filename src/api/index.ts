@@ -5,6 +5,7 @@ import axios, {
   type InternalAxiosRequestConfig
 } from 'axios'
 import { getToken, removeToken } from "@/utils/userStorage"
+import router from '@/router'
 
 interface ApiErrorResponse {
   message?: string
@@ -14,7 +15,6 @@ interface ApiErrorResponse {
 
 const API_CONFIG = {
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: 30000,
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
@@ -61,6 +61,7 @@ api.interceptors.response.use(
 
       case 403:
         console.error('Access Forbidden')
+        router.push({ name: 'AccessForbidden' })
         break
 
       case 404:

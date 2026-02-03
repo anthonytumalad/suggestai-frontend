@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { authService } from '@/services/authService'
+import FormLayout from '@/layouts/FormLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +29,18 @@ const router = createRouter({
           meta: { title: 'Forms' }
         },
         {
+          path: 'forms/:id',
+          component: () => import('@/layouts/FormLayout.vue'),
+          children: [
+            {
+              path: 'suggestions',
+              name: 'formSuggestions',
+              component: () => import('@/views/forms/FormSuggestionView.vue'),
+              meta: { title: 'Suggestions' }
+            }
+          ]
+        },
+        {
           path: 'reports',
           name: 'reports',
           component: () => import('@/views/reports/ReportsView.vue'),
@@ -45,6 +58,12 @@ const router = createRouter({
       name: 'NotFound',
       component: () => import('@/views/errors/NotFoundView.vue'),
       meta: { title: 'Page Not Found' }
+    },
+    {
+      path: '/forbidden',
+      name: 'AccessForbidden',
+      component: () => import('@/views/errors/ForbiddenView.vue'),
+      meta: { title: 'Access Forbidden' }
     }
   ],
 })
@@ -65,15 +84,12 @@ router.beforeEach(async (to, from, next) => {
       name: 'SignIn',
       query: { redirect: to.fullPath }
     })
-  } else if (isGuestOnly && isAuthenticated) {
-    const redirectPath = to.query.redirect as string
-
-    if (redirectPath && redirectPath !== '/signin') {
-      next(redirectPath)
-    } else {
-      next({ name: 'dashboard' })
-    }
-  } else {
+  }
+  else if (isGuestOnly && isAuthenticated) {
+    const redirectPath = (to.query.redirect as string) || '/'
+    next(redirectPath)
+  }
+  else {
     next()
   }
 })
