@@ -87,8 +87,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuth } from '@/composables/auth/useAuth'
+import { useRouter, useRoute } from 'vue-router'
 
 const { signIn, isSigningIn, signInError } = useAuth()
+const router = useRouter()
+const route = useRoute()
 
 const credentials = ref({
   identity: '',
@@ -101,8 +104,8 @@ async function handleSignIn() {
   try {
     await signIn(credentials.value)
 
-    console.log('✅ Login successful, redirecting...')
-    console.log('✅ Token:', localStorage.getItem('token'))
+    const redirectPath = (route.query.redirect as string) || '/'
+    await router.push(redirectPath)
   } catch (err) {
     console.error('Sign in failed:', err)
   }
