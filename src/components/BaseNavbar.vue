@@ -65,7 +65,7 @@ const handleLogout = async () => {
     await signOut()
     isDropdownOpen.value = false
 
-    await router.replace(router.currentRoute.value.fullPath)
+    await router.push({ name: 'SignIn' })
   } catch (error) {
     console.error('Logout failed:', error)
   }
