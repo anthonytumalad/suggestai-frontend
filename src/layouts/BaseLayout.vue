@@ -58,8 +58,8 @@ import BaseNavbar from '@/components/BaseNavbar.vue'
 import {
   IconHome,
   IconForms,
-  IconChartBar,
-  IconTrash,
+  // IconChartBar,
+  // IconTrash,
 } from '@tabler/icons-vue'
 
 const route = useRoute()
@@ -75,16 +75,16 @@ const items = [
     label: 'Forms',
     icon: IconForms,
   },
-  {
-    name: 'reports',
-    label: 'Reports',
-    icon: IconChartBar,
-  },
-  {
-    name: 'trash',
-    label: 'Trash',
-    icon: IconTrash,
-  }
+  // {
+  //   name: 'reports',
+  //   label: 'Reports',
+  //   icon: IconChartBar,
+  // },
+  // {
+  //   name: 'trash',
+  //   label: 'Trash',
+  //   icon: IconTrash,
+  // }
 ]
 
 const isCollapsed = ref(false)
