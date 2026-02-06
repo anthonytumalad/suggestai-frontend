@@ -58,6 +58,12 @@
 
       </div>
     </template>
+
+            <template #cell-created_at="{ item }">
+          <span class="text-sm">
+            {{ formatDate(item.created_at) }}
+          </span>
+        </template>
   </BaseTable>
 </template>
 
@@ -85,5 +91,18 @@ const getInitials = (email: string | null | undefined) => {
   const name = email.split('@')[0]
   if (!name) return '?'
   return name.substring(0, 2).toUpperCase()
+}
+
+const formatDate = (date: Date) => {
+  const dateStr = new Date(date).toLocaleDateString('en-PH', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+  const timeStr = new Date(date).toLocaleTimeString('en-PH', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+  return `${dateStr} at ${timeStr}`
 }
 </script>

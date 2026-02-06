@@ -43,6 +43,8 @@ export interface Form {
   created_at: string
   updated_at: string
   suggestions_count?: number
+  url: string
+  qr_code_url: string
 }
 
 export interface Suggestion {
@@ -53,8 +55,8 @@ export interface Suggestion {
   student_email?: string | null
   suggestion: string
   is_anonymous: boolean
-  created_at: string
-  updated_at: string
+  created_at: Date
+  updated_at: Date
 }
 
 export interface PaginationMeta {
@@ -87,6 +89,13 @@ export class FormService {
     })
 
     return data
+  }
+
+  static async show(formId: number): Promise<{ data: Form }> {
+    const response = await api.get<{ data: Form }>(
+      apiEndpoints.forms.show(formId)
+    )
+    return response.data
   }
 
   static async suggestions(
@@ -134,5 +143,3 @@ export class FormService {
     return data
   }
 }
-
-export const formService = new FormService()
