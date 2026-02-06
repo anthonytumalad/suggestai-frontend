@@ -4,12 +4,9 @@
     :disabled="props.disabled || props.loading"
     v-bind="$attrs"
   >
-     <IconLoader v-if="props.loading" class="animate-spin mr-2 h-5 w-5"/>
-
-     <component v-else-if="props.icon" :is="props.icon" class="mr-2 h-5 w-5" />
-
-     <span v-if="props.label"><slot>{{ props.label }}</slot></span>
-
+    <IconLoader v-if="props.loading" class="animate-spin mr-2 h-5 w-5" />
+    <component v-else-if="props.icon" :is="props.icon" :class="props.label ? 'mr-2 h-5 w-5' : 'h-5 w-5'" />
+    <span v-if="props.label"><slot>{{ props.label }}</slot></span>
     <slot v-else />
   </button>
 </template>

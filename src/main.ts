@@ -16,7 +16,7 @@ import BaseInput from './components/base/input/BaseInput.vue'
 import BaseButton from './components/base/button/BaseButton.vue'
 import BaseAlert from './components/base/alert/BaseAlert.vue'
 import BaseDatePicker from './components/base/datepicker/BaseDatePicker.vue'
-import BaseDialog from './components/modal/BaseDialog.vue'
+import BaseDialog from './components/base/modal/BaseDialog.vue'
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -7,7 +7,7 @@
     :class="customClass"
   >
     <template #default>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center space-x-4">
         <component
           :is="severityIcon"
           stroke="2"
@@ -15,12 +15,12 @@
           :class="{ 'animate-spin': severity === 'secondary' }"
         />
         <div class="flex-1">
-          <strong
+          <span
             v-if="title"
-            class="block mb-1"
+            class="block text-base"
           >
             {{ title }}
-          </strong>
+          </span>
           <span class="text-sm">{{ message }}</span>
         </div>
       </div>
