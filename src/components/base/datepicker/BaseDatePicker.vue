@@ -2,7 +2,7 @@
   <div class="date-range-picker flex items-center space-x-2 text-text-base">
     <select
       v-model="selectedFilter"
-      class="border border-border-muted rounded px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+      class="bg-bg-primary border border-border-muted rounded px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
     >
       <option
         v-for="opt in filterOptions"
@@ -31,14 +31,14 @@
     >
       <div
         v-if="selectedFilter !== 'custom'"
-        class="border border-border-muted rounded px-3 py-1 text-sm bg-base min-w-45"
+        class="bg-bg-primary border border-border-muted rounded px-3 py-1 text-sm bg-base min-w-45"
       >
         {{ displayRange || '—' }}
       </div>
 
       <div
         v-else
-        class="flex items-center gap-2 rounded border border-border-muted px-3 py-1"
+        class="flex items-center gap-2 rounded bg-bg-primary border border-border-muted px-3 py-1"
       >
         <input
           type="date"

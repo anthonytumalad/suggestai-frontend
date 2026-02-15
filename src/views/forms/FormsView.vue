@@ -8,7 +8,7 @@
       class="mb-4"
     />
     <div
-      class="bg-bg-primary p-6 rounded"
+      class="bg-bg-primary p-6 rounded border border-border-muted"
     >
       <FormsTable
         :forms="forms"
