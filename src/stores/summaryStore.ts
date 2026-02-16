@@ -1,12 +1,29 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { TopicResponse } from '@/services/formService'
 
-type TopicData = TopicResponse['data']
+export interface StoredSession {
+  session: {
+    id: number
+    name: string
+    total_topics: number
+    total_documents: number
+    outliers: number
+    created_at: string
+  }
+  topics: Array<{
+    id: number
+    topic_id: number
+    label: string
+    document_count: number
+    representation_score: number
+    keywords: string[]
+  }>
+  isSaved: boolean
+}
 
 interface SummaryData {
   formId: number
-  data: TopicData
+  summary: StoredSession
   timestamp: string
   dateFilter: {
     start: string | null
@@ -22,10 +39,16 @@ export const useSummaryStore = defineStore('summary', () => {
       const stored = localStorage.getItem(STORAGE_KEY)
       if (stored) {
         const parsed = JSON.parse(stored)
-        return parsed
+
+        // Validate the structure
+        if (typeof parsed === 'object' && parsed !== null) {
+          console.log('📦 Loaded summaries from storage:', Object.keys(parsed))
+          return parsed as Record<number, SummaryData>
+        }
       }
-    } catch (error) {
-      console.error('Failed to load summaries from storage:', error)
+    } catch (err) {
+      console.warn('Failed to load summaries from storage — resetting.', err)
+      localStorage.removeItem(STORAGE_KEY)
     }
     return {}
   }
@@ -34,44 +57,69 @@ export const useSummaryStore = defineStore('summary', () => {
 
   const saveToStorage = () => {
     try {
-      const toSave = JSON.stringify(summaries.value)
-      localStorage.setItem(STORAGE_KEY, toSave)
-    } catch (error) {
+      const data = JSON.stringify(summaries.value)
+      localStorage.setItem(STORAGE_KEY, data)
+      console.log('💾 Saved summaries to storage:', Object.keys(summaries.value))
+    } catch (err) {
+      console.error('Failed to persist summaries:', err)
+      if (err instanceof DOMException && err.name === 'QuotaExceededError') {
+        console.warn('LocalStorage quota exceeded. Consider clearing old data.')
+      }
     }
   }
 
   const setSummary = (
     formId: number,
-    data: TopicData,
+    summary: StoredSession,
     dateFilter: { start: Date | null; end: Date | null }
   ) => {
-    console.log('Setting summary for formId:', formId)
+    // Ensure isSaved property exists
+    const validatedSummary: StoredSession = {
+      ...summary,
+      isSaved: summary.isSaved ?? false
+    }
+
     summaries.value[formId] = {
       formId,
-      data,
+      summary: validatedSummary,
       timestamp: new Date().toISOString(),
       dateFilter: {
-        start: dateFilter.start?.toISOString() || null,
-        end: dateFilter.end?.toISOString() || null
-      }
+        start: dateFilter.start?.toISOString() ?? null,
+        end: dateFilter.end?.toISOString() ?? null,
+      },
     }
     saveToStorage()
   }
 
   const getSummary = (formId: number): SummaryData | undefined => {
-    const summary = summaries.value[formId]
-    return summary
+    const data = summaries.value[formId]
+
+    // Validate the data structure before returning
+    if (data && data.summary && typeof data.summary === 'object') {
+      console.log('✅ Found stored summary for form', formId)
+      return data
+    }
+
+    return undefined
   }
 
   const clearSummary = (formId: number): void => {
     delete summaries.value[formId]
     saveToStorage()
+    console.log('🗑️ Cleared summary for form', formId)
+  }
+
+  const clearAll = (): void => {
+    summaries.value = {}
+    localStorage.removeItem(STORAGE_KEY)
+    console.log('🗑️ Cleared all summaries')
   }
 
   return {
     summaries,
     setSummary,
     getSummary,
-    clearSummary
+    clearSummary,
+    clearAll,
   }
 })

@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col space-y-4">
-    <!-- Error Alert -->
+
     <BaseAlert
       v-if="summarizeError"
       severity="error"
@@ -9,7 +9,6 @@
       @close="clearError"
     />
 
-    <!-- Page Header -->
     <SuggestionPageHeader
       :title="formTitle"
       :form-url="formUrl"
@@ -17,38 +16,49 @@
       @download="handleDownload"
       @edit="handleEdit"
       @delete="handleDelete"
-
     />
 
-    <!-- Filters -->
     <SuggestionFilters
       v-model:dateFilter="dateFilter"
       :disabled="isSummarizing || !suggestions.length"
       @summarize="showConfirmDialog = true"
     />
 
-    <!-- Loading Alert -->
+    <!-- Analyzing in progress -->
     <BaseAlert
       v-if="isSummarizing"
       severity="secondary"
-      :title="`Summarizing ${total} suggestions... Please wait`"
+      :title="`Analyzing ${total} suggestions... Please wait`"
       :closable="false"
     />
 
-    <!-- Summary Card -->
-    <SuggestionSummaryCard
-      v-if="showSummary && !isSummarizing"
-      :summary="displaySummary"
-      :total-suggestions="total"
-      @clear="clearSummary"
+    <!-- Saving in progress -->
+    <BaseAlert
+      v-if="isSaving"
+      severity="secondary"
+      title="Saving topic session..."
+      :closable="false"
     />
 
-    <!-- Suggestions Table -->
-    <div class="bg-bg-primary p-6 rounded">
+    <!-- Summary card — shown after analyze, updated after save -->
+    <SuggestionSummaryCard
+      v-if="displaySummary && !isSummarizing"
+      :summary="displaySummary"
+      :total-suggestions="total"
+      :is-saved="showSaved"
+      :is-saving="isSaving"
+      :duplicate-detected="duplicateDetected"
+      :existing-session="existingSession"
+      @clear="clearSummary"
+      @save="handleSave"
+    />
+
+    <!-- Suggestions table -->
+    <div class="bg-bg-primary p-6 rounded border border-border-muted">
       <div class="flex flex-col space-y-4">
         <div class="flex items-center space-x-4">
           <div class="flex items-center space-x-2 text-sm">
-            <span class="text-text-muted">Total suggestion:</span>
+            <span class="text-text-muted">Total suggestions:</span>
             <span class="font-medium text-text-base">{{ total }}</span>
           </div>
           <span v-if="dateFilter.start || dateFilter.end" class="text-text-muted text-sm">
@@ -69,14 +79,19 @@
       </div>
     </div>
 
-    <BaseDialog v-model="showConfirmDialog" title="Confirm Summarization" size="lg">
+    <!-- Confirm analyze dialog -->
+    <BaseDialog v-model="showConfirmDialog" title="Confirm Analysis" size="lg">
       <div class="space-y-4">
         <p class="text-base text-text-base">
-          Are you sure you want to summarize
-          <span class="font-semibold">{{ total }} suggestions</span>?
+          Analyze
+          <span class="font-semibold">{{ total }} suggestions</span>
+          for topics?
         </p>
         <p v-if="dateFilter.start || dateFilter.end" class="text-sm text-text-muted">
           {{ formatDateRange() }}
+        </p>
+        <p class="text-sm text-text-muted">
+          This may take 30–60 seconds depending on the number of suggestions.
         </p>
       </div>
 
@@ -90,12 +105,13 @@
         <BaseButton
           variant="primary"
           size="sm"
-          label="Yes, summarize"
+          label="Yes, analyze"
           :loading="isSummarizing"
           @click="handleConfirmSummarize"
         />
       </template>
     </BaseDialog>
+
   </div>
 </template>
 
@@ -110,47 +126,42 @@ import SuggestionPageHeader from '@/components/forms/SuggestionPageHeader.vue'
 import SuggestionFilters from '@/components/forms/SuggestionFilters.vue'
 import SuggestionSummaryCard from '@/components/base/card/forms/SuggestionSummaryCard.vue'
 
-const route = useRoute()
-
+const route  = useRoute()
 const formId = parseInt(route.params.id as string)
-const { form } = useFormDetails(formId)
 
+const { form } = useFormDetails(formId)
 const formTitle = ref<string>(route.query.title as string)
 
 const columns = [
-  { key: 'id', label: '#', sortable: false },
-  { key: 'student', label: 'Student', slot: true, sortable: true },
+  { key: 'id',         label: '#',          sortable: false },
+  { key: 'student',    label: 'Student',    slot: true, sortable: true },
   { key: 'suggestion', label: 'Suggestion', sortable: false },
-  { key: 'created_at', label: 'Date', sortable: true, slot: true },
+  { key: 'created_at', label: 'Date',       sortable: true, slot: true },
 ]
 
 const {
-  suggestions,
-  total,
-  isLoading,
-  isFetching,
-  page,
-  perPage,
-  setPage,
-  setPerPage,
-  setDateRange,
+  suggestions, total, isLoading, isFetching,
+  page, perPage, setPage, setPerPage, setDateRange,
 } = useSuggestions({ formId })
 
 const {
   displaySummary,
-  showSummary,
+  showSaved,
+  duplicateDetected,
+  existingSession,
   isSummarizing,
+  isSaving,
   summarizeError,
   dateFilter,
   handleSummarize,
+  handleSave,
   clearSummary,
   clearError,
-  handleDateChange
+  handleDateChange,
 } = useSuggestionSummary(formId)
 
 const showConfirmDialog = ref(false)
 
-// Watch dateFilter changes
 watch(dateFilter, (value) => {
   setDateRange(value)
   handleDateChange(value)
@@ -161,17 +172,9 @@ const handleConfirmSummarize = async () => {
   await handleSummarize()
 }
 
-const handleDownload = () => {
-  // Implement download logic
-}
-
-const handleEdit = () => {
-  // Implement edit logic
-}
-
-const handleDelete = () => {
-  // Implement delete logic
-}
+const handleDownload = () => {}
+const handleEdit     = () => {}
+const handleDelete   = () => {}
 
 const formUrl = computed(() => {
   if (!form.value?.slug) return ''
@@ -184,23 +187,17 @@ const qrCodeUrl = computed(() => {
   return `${baseUrl}/forms/${form.value.slug}/qrcode`
 })
 
-const formatDate = (date: Date): string => {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  }).format(date)
-}
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date)
 
-const formatDateRange = (): string => {
+const formatDateRange = () => {
   const parts: string[] = []
   if (dateFilter.value.start) parts.push(formatDate(dateFilter.value.start))
-  if (dateFilter.value.end) parts.push(formatDate(dateFilter.value.end))
+  if (dateFilter.value.end)   parts.push(formatDate(dateFilter.value.end))
   return parts.join(' to ')
 }
 
-const formatDateRangeDisplay = (): string => {
-  return (dateFilter.value.start ? ` from ${formatDate(dateFilter.value.start)}` : '') +
-         (dateFilter.value.end ? ` to ${formatDate(dateFilter.value.end)}` : '')
-}
+const formatDateRangeDisplay = () =>
+  (dateFilter.value.start ? `from ${formatDate(dateFilter.value.start)}` : '') +
+  (dateFilter.value.end   ? ` to ${formatDate(dateFilter.value.end)}`   : '')
 </script>

@@ -37,6 +37,12 @@ const router = createRouter({
               name: 'formSuggestions',
               component: () => import('@/views/forms/FormSuggestionView.vue'),
               meta: { title: 'Suggestions' }
+            },
+            {
+              path: 'summary',
+              name: 'formSummary',
+              component: () => import('@/views/forms/FormsSummaryView.vue'),
+              meta: { title: 'Summary' }
             }
           ]
         },

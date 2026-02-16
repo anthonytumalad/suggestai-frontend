@@ -59,15 +59,35 @@
       </div>
     </template>
 
-            <template #cell-created_at="{ item }">
-          <span class="text-sm">
-            {{ formatDate(item.created_at) }}
-          </span>
-        </template>
+    <template #cell-created_at="{ item }">
+      <span class="text-sm">
+        {{ formatDate(item.created_at) }}
+      </span>
+    </template>
+
+    <template #cell-suggestion="{ item }">
+    <div class="max-w-md">
+      <p
+        class="text-sm"
+        :class="expanded[item.id] ? '' : 'line-clamp-2'"
+      >
+        {{ item.suggestion }}
+      </p>
+
+      <button
+        v-if="item.suggestion.length > 120"
+        class="text-xs text-primary mt-1 hover:underline"
+        @click="toggle(item.id)"
+      >
+        {{ expanded[item.id] ? 'Show less' : 'View more' }}
+      </button>
+    </div>
+  </template>
   </BaseTable>
 </template>
 
 <script setup lang="ts">
+import { reactive } from 'vue'
 import type { Suggestion } from '@/services/formService'
 import BaseTable, { type Column } from '../BaseTable.vue'
 import { IconUser } from '@tabler/icons-vue'
@@ -104,5 +124,11 @@ const formatDate = (date: Date) => {
     minute: '2-digit'
   })
   return `${dateStr} at ${timeStr}`
+}
+
+const expanded = reactive<Record<number, boolean>>({})
+
+const toggle = (id: number) => {
+  expanded[id] = !expanded[id]
 }
 </script>

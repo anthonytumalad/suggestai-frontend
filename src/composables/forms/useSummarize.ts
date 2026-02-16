@@ -1,68 +1,114 @@
-import { ref, computed } from "vue"
-import { FormService } from "@/services/formService"
-import { useMutation } from "@tanstack/vue-query"
+import { ref, computed } from 'vue'
+import { FormService } from '@/services/formService'
+import type { AnalyzeTopicsResponse, SaveTopicSessionResponse } from '@/services/formService'
+import { isAxiosError } from 'axios'
+import type { ApiErrorResponse } from '@/api'
 
-interface Error {
-  response?: {
-    data?: {
-      error?: string
-      message?: string
-    }
-  }
-  message?: string
+interface DateRange {
+  start: Date | null
+  end: Date | null
 }
 
-interface SummarizeParams {
-  start_date?: string
-  end_date?: string
+function toParams(dateRange: DateRange) {
+  return {
+    start_date: dateRange.start ? dateRange.start.toISOString().split('T')[0] : undefined,
+    end_date:   dateRange.end   ? dateRange.end.toISOString().split('T')[0]   : undefined,
+  }
+}
+
+function extractErrorMessage(err: unknown): string {
+  if (isAxiosError<ApiErrorResponse>(err)) {
+    return (
+      err.response?.data?.message ||
+      err.message                 ||
+      'Request failed'
+    )
+  }
+  if (err instanceof Error) return err.message
+  return 'An unexpected error occurred'
 }
 
 export function useSummarize() {
-  const isSummarizing = ref(false)
-  const error = ref<string | null>(null)
+  const isSummarizing  = ref(false)
+  const isSaving       = ref(false)
+  const error          = ref<string | null>(null)
 
-  const mutation = useMutation({
-    mutationFn: ({ formId, params }: { formId: number; params: SummarizeParams }) =>
-      FormService.analyzeTopics(formId, params),
-    onMutate: () => {
-      isSummarizing.value = true
-      error.value = null
-    },
-    onSuccess: (data) => {
+  const analyzeResult  = ref<AnalyzeTopicsResponse | null>(null)
+
+  const savedResult    = ref<SaveTopicSessionResponse | null>(null)
+
+  const analyzeTopics = async (formId: number, dateRange: DateRange) => {
+    isSummarizing.value = true
+    error.value         = null
+    analyzeResult.value = null
+    savedResult.value   = null
+
+    try {
+      const response      = await FormService.analyzeTopics(formId, toParams(dateRange))
+      analyzeResult.value = response
+      return response
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err)
+      throw err
+    } finally {
       isSummarizing.value = false
-      console.log('Analysis complete:', data)
-    },
-    onError: (err: Error) => {
-      isSummarizing.value = false
-      error.value = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to analyze topics'
-    },
-  })
-
-  const summarizeTopics = async (
-    formId: number,
-    dateRange: { start: Date | null; end: Date | null }
-  ) => {
-    const params: SummarizeParams = {}
-
-    if (dateRange.start) {
-      params.start_date = dateRange.start.toISOString().split('T')[0]
     }
-    if (dateRange.end) {
-      params.end_date = dateRange.end.toISOString().split('T')[0]
-    }
-
-    return mutation.mutateAsync({ formId, params })
   }
 
-  const data = computed(() => {
-    return mutation.data.value?.data ?? null
-  })
+
+  const saveTopicSession = async (
+    formId: number,
+    dateRange: DateRange,
+    options: { session_name?: string; action?: 'keep_both' | 'replace' } = {}
+  ) => {
+    isSaving.value    = true
+    error.value       = null
+    savedResult.value = null
+
+    try {
+      const response    = await FormService.saveTopicSession(formId, {
+        ...toParams(dateRange),
+        ...options,
+      })
+      savedResult.value = response
+      return response
+    } catch (err: unknown) {
+      error.value = extractErrorMessage(err)
+      throw err
+    } finally {
+      isSaving.value = false
+    }
+  }
+
+  const previewTopics = computed(() => analyzeResult.value?.preview.topics ?? [])
+
+  const duplicateDetected = computed(() => analyzeResult.value?.duplicate_detected ?? false)
+
+  const existingSession = computed(() => analyzeResult.value?.comparison?.existing_session ?? null)
+
+  const savedSession = computed(() => savedResult.value?.data ?? null)
+
+  const reset = () => {
+    analyzeResult.value = null
+    savedResult.value   = null
+    error.value         = null
+  }
 
   return {
-    summarizeTopics,
+    analyzeTopics,
+    saveTopicSession,
+    reset,
+
     isSummarizing,
+    isSaving,
+
     error,
-    data,
-    isSuccess: mutation.isSuccess
+
+    analyzeResult,
+    savedResult,
+    previewTopics,
+    duplicateDetected,
+    existingSession,
+    savedSession,
   }
 }

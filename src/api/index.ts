@@ -7,7 +7,7 @@ import axios, {
 import { getToken, removeToken } from "@/utils/userStorage"
 import router from '@/router'
 
-interface ApiErrorResponse {
+export interface ApiErrorResponse {
   message?: string
   errors?: Record<string, string[]>
   statusCode?: number
