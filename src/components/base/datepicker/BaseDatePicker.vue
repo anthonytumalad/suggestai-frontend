@@ -14,14 +14,14 @@
 
     <div
       v-if="selectedFilter === 'all'"
-      class="border border-border-muted rounded px-3 py-1 text-sm bg-base min-w-45"
+      class="bg-bg-primary border border-border-muted rounded px-3 py-1 text-sm bg-base min-w-45"
     >
       All Dates
     </div>
 
     <div
       v-else-if="selectedFilter === 'today'"
-      class="border border-border-muted rounded px-3 py-1 text-sm bg-base min-w-45"
+      class="bg-bg-primary border border-border-muted rounded px-3 py-1 text-sm bg-base min-w-45"
     >
       {{ displayDay || '—' }}
     </div>
@@ -38,7 +38,7 @@
 
       <div
         v-else
-        class="flex items-center gap-2 rounded bg-bg-primary border border-border-muted px-3 py-1"
+        class="flex items-center gap-2 rounded bg-bg-primary border border-border-muted px-3 py-1 text-sm"
       >
         <input
           type="date"
@@ -140,7 +140,6 @@ const getPresetRange = (mode: FilterType) => {
   end.setHours(23, 59, 59, 999)
 
   if (mode === 'today') {
-    // already set
   } else if (mode === 'last7') {
     start.setDate(start.getDate() - 6)
   } else if (mode === 'thisMonth') {

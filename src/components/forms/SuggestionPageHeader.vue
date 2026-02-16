@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-between border-b border-border-muted pb-4">
+  <div class="flex items-center justify-between pb-4">
     <h1 class="text-3xl font-medium text-text-base">
       {{ title }}
     </h1>
