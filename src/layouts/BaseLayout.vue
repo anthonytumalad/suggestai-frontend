@@ -1,14 +1,14 @@
 <template>
-  <div class="h-screen bg-bg-muted">
+  <div class="h-screen bg-white">
     <!-- Fixed Sidebar -->
     <aside
       :class="[
         isCollapsed ? 'w-20' : 'w-70',
       ]"
-      class="fixed left-0 top-0 z-40 flex h-screen flex-col overflow-y-auto border-r border-border-muted bg-bg-primary transition-[width] duration-300 ease-in-out"
+      class="fixed left-0 top-0 z-40 flex h-screen flex-col overflow-y-auto border-r border-border-muted transition-[width] duration-300 ease-in-out"
     >
       <!-- Logo -->
-      <div class="flex items-center space-x-2 p-4">
+      <div class="flex items-center space-x-2 p-4 pb-10">
         <img
           src="../assets/img/logo.png"
           alt="Logo"
@@ -23,28 +23,28 @@
       </div>
 
       <!-- Navigation -->
-      <div v-if="!isCollapsed" class="px-4 pb-2">
+      <div v-if="!isCollapsed" class="px-4 pb-4">
         <h3 class="text-xs font-semibold uppercase tracking-wider text-text-muted">
           Main Navigation
         </h3>
       </div>
 
-      <nav class="flex-1 space-y-2 p-2">
+      <nav class="flex-1">
         <router-link
           v-for="link in items"
           :key="link.name"
           :to="{ name: link.name }"
-          class="group flex items-center gap-4 rounded-lg px-4 py-2 transition-all duration-300"
+          class="group flex items-center gap-4 px-4 py-2 transition-all duration-300"
           :class="[
             isLinkActive(link.name)
-              ? 'bg-bg-muted font-medium text-primary'
+              ? 'bg-bg-muted font-medium text-primary rounded'
               : 'text-text-muted hover:bg-bg-muted hover:text-primary'
           ]"
         >
           <component
             :is="link.icon"
             stroke="2"
-            class="h-5 w-5 shrink-0 transition-transform duration-300"
+            class="h-6 w-6 shrink-0 transition-transform duration-300"
             :class="[
               isLinkActive(link.name)
                 ? 'text-primary'
@@ -54,7 +54,7 @@
 
           <span
             v-if="!isCollapsed"
-            class="whitespace-nowrap text-sm"
+            class="whitespace-nowrap text-base"
           >
             {{ link.label }}
           </span>
@@ -71,7 +71,7 @@
       <BaseNavbar @toggle-sidebar="isCollapsed = !isCollapsed" />
 
       <!-- Scrollable Content -->
-      <main class="flex-1 overflow-y-auto px-6 py-4">
+      <main class="flex-1 overflow-y-auto">
         <router-view />
       </main>
     </div>
@@ -91,6 +91,7 @@ import BaseNavbar from '@/components/BaseNavbar.vue'
 import {
   IconForms,
   IconHome,
+  IconReportAnalytics
 } from '@tabler/icons-vue'
 
 /* -----------------------------
@@ -113,6 +114,11 @@ const items = [
     label: 'Forms',
     icon: IconForms,
   },
+  {
+    name: 'reports',
+    label: 'Reports',
+    icon: IconReportAnalytics,
+  },
 ]
 
 /* -----------------------------
@@ -125,15 +131,18 @@ const isLinkActive = (linkName: string): boolean => {
 
   if (linkName === 'forms') {
     const formRoutes = [
+      'addForm',
       'formSuggestions',
       'formSummary',
-      '',
+      'formOverview',
     ]
 
-    return (
-      formRoutes.includes(route.name as string) &&
-      !!route.params.id
-    )
+    // return (
+    //   formRoutes.includes(route.name as string) &&
+    //   !!route.params.id
+    // )
+
+    return formRoutes.includes(route.name as string)
   }
 
   return false

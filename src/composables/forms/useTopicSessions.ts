@@ -1,116 +1,152 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, type Ref } from 'vue'
-import {
-  FormService,
-  type TopicSession,
-  type TopicSessionsResponse,
-  type TopicSessionDetailsResponse
-} from '@/services/formService'
+import { formService } from '@/services/forms'
+import type { TopicSession } from '@/services/forms'
+
+// --- types ---
+
+export type SortOption = 'newest' | 'oldest' | 'topics_desc' | 'suggestions_desc' | 'outliers_desc'
+export type TopicsRange = '1-5' | '6-15' | '15+'
 
 interface UseTopicSessionsOptions {
-  formId: Ref<number> | number
-  page?: Ref<number>
-  perPage?: Ref<number>
+  formId:          Ref<number> | number
+  page?:           Ref<number>
+  perPage?:        Ref<number>
+  search?:         Ref<string>
+  selectedStatus?: Ref<string | null>
+  selectedTopics?: Ref<TopicsRange | null>
+  selectedSort?:   Ref<SortOption | null>
 }
+
+// --- query keys ---
+
+export const TOPIC_SESSIONS_QUERY_KEYS = {
+  all:     ['topic-sessions'] as const,
+  list:    (formId: number) => ['topic-sessions', formId] as const,
+  detail:  (formId: number, sessionId: number) => ['topic-sessions', formId, sessionId] as const,
+}
+
+// --- helpers ---
+
+const toNum = (r: Ref<number> | number) =>
+  typeof r === 'number' ? r : r.value
+
+const matchesTopicRange = (n: number, range: TopicsRange) => {
+  if (range === '1-5')  return n >= 1 && n <= 5
+  if (range === '6-15') return n >= 6 && n <= 15
+  if (range === '15+')  return n > 15
+  return true
+}
+
+// --- composable ---
 
 export function useTopicSessions(options: UseTopicSessionsOptions) {
   const queryClient = useQueryClient()
 
-  const formId = computed(() =>
-    typeof options.formId === 'number' ? options.formId : options.formId.value
-  )
+  const formId  = computed(() => toNum(options.formId))
+  const page    = options.page    ?? ref(1)
+  const perPage = options.perPage ?? ref(15)
 
-  const page = options.page || ref(1)
-  const perPage = options.perPage || ref(15)
+  // --- sessions list ---
 
   const sessionsQuery = useQuery({
-    queryKey: ['topic-sessions', formId],
-    queryFn: () => FormService.getTopicSessions(formId.value),
-    enabled: computed(() => !!formId.value),
+    queryKey: computed(() => TOPIC_SESSIONS_QUERY_KEYS.list(formId.value)),
+    queryFn:  () => formService.getTopicSessions(formId.value),
+    enabled:  computed(() => !!formId.value),
   })
+
+  const sessions = computed(() => sessionsQuery.data.value?.data ?? [])
+
+  // --- filtered + sorted ---
+
+  const filteredSessions = computed(() => {
+    let result = [...sessions.value]
+
+    const q = options.search?.value?.toLowerCase()
+    if (q) result = result.filter(s => s.name?.toLowerCase().includes(q))
+
+    const status = options.selectedStatus?.value
+    if (status) result = result.filter(s => s.status === status)
+
+    const topics = options.selectedTopics?.value
+    if (topics) result = result.filter(s => matchesTopicRange(s.total_topics ?? 0, topics))
+
+    const sort = options.selectedSort?.value
+    if (sort) {
+      const sorters: Record<SortOption, (a: TopicSession, b: TopicSession) => number> = {
+        newest:           (a, b) => +new Date(b.created_at) - +new Date(a.created_at),
+        oldest:           (a, b) => +new Date(a.created_at) - +new Date(b.created_at),
+        topics_desc:      (a, b) => (b.total_topics    ?? 0) - (a.total_topics    ?? 0),
+        suggestions_desc: (a, b) => (b.total_documents ?? 0) - (a.total_documents ?? 0),
+        outliers_desc:    (a, b) => (b.outliers        ?? 0) - (a.outliers        ?? 0),
+      }
+      result.sort(sorters[sort])
+    }
+
+    return result
+  })
+
+  const total = computed(() => filteredSessions.value.length)
 
   const paginatedSessions = computed(() => {
-    const sessions = sessionsQuery.data.value?.data || []
     const start = (page.value - 1) * perPage.value
-    const end = start + perPage.value
-    return sessions.slice(start, end)
+    return filteredSessions.value.slice(start, start + perPage.value)
   })
 
-  const total = computed(() => sessionsQuery.data.value?.data?.length || 0)
-
-  const hasDuplicates = (session: TopicSession) => {
-    const sessions = sessionsQuery.data.value?.data || []
-    const dateRange = session.model_parameters?.date_range
-
-    if (!dateRange) return false
-
-    return sessions.filter(s => {
-      const range = s.model_parameters?.date_range
-      return range?.start === dateRange.start &&
-        range?.end === dateRange.end &&
-        s.id !== session.id
-    }).length > 0
-  }
+  // --- session details ---
 
   const useSessionDetails = (sessionId: Ref<number> | number) => {
-    const id = computed(() =>
-      typeof sessionId === 'number' ? sessionId : sessionId.value
-    )
-
+    const id = computed(() => toNum(sessionId))
     return useQuery({
-      queryKey: ['topic-session-details', formId, id],
-      queryFn: () => FormService.getTopicSessionDetails(formId.value, id.value),
-      enabled: computed(() => !!id.value && !!formId.value),
+      queryKey: computed(() => TOPIC_SESSIONS_QUERY_KEYS.detail(formId.value, id.value)),
+      queryFn:  () => formService.getTopicSessionDetails(formId.value, id.value),
+      enabled:  computed(() => !!id.value && !!formId.value),
     })
   }
 
-  const deleteSessionMutation = useMutation({
-    mutationFn: (sessionId: number) =>
-      FormService.deleteTopicSession(formId.value, sessionId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['topic-sessions', formId]
-      })
-    },
-  })
+  // --- mutations ---
+
+  const invalidateSessions = () =>
+    queryClient.invalidateQueries({ queryKey: TOPIC_SESSIONS_QUERY_KEYS.list(formId.value) })
 
   const analyzeTopicsMutation = useMutation({
-    mutationFn: (params: {
-      start_date?: string
-      end_date?: string
-      force_create?: boolean
-    }) => FormService.analyzeTopics(formId.value, params),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['topic-sessions', formId]
-      })
-    },
+    mutationFn: (params: { start_date?: string; end_date?: string }) =>
+      formService.analyzeTopics(formId.value, params),
+    onSuccess: invalidateSessions,
   })
 
+  // --- utils ---
+
+  const hasDuplicates = (session: TopicSession) =>
+    sessions.value.some(s =>
+      s.id !== session.id &&
+      s.date_range?.start === session.date_range?.start &&
+      s.date_range?.end   === session.date_range?.end
+    )
 
   return {
-    // Queries
-    sessionsQuery,
-    sessions: computed(() => sessionsQuery.data.value?.data || []),
-    paginatedSessions,
+    // query state
+    isLoading:  sessionsQuery.isLoading,
+    isFetching: sessionsQuery.isFetching,
+    isError:      sessionsQuery.isError,
+    sessionError: sessionsQuery.error,
 
-    // Pagination
-    page,
-    perPage,
+    // data
+    sessions,
+    paginatedSessions,
     total,
 
-    // Utilities
+    // pagination
+    page,
+    perPage,
+
+    // utils
     hasDuplicates,
     useSessionDetails,
 
-    // Mutations
-    deleteSession: deleteSessionMutation.mutateAsync,
-    isDeletingSession: computed(() => deleteSessionMutation.isPending.value),
-
+    // mutations
     analyzeTopics: analyzeTopicsMutation.mutateAsync,
-    isAnalyzing: computed(() => analyzeTopicsMutation.isPending.value),
-    analyzeError: computed(() => analyzeTopicsMutation.error.value),
+    isAnalyzing:   analyzeTopicsMutation.isPending,
+    analyzeError:  analyzeTopicsMutation.error,
   }
 }
-
-

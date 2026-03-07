@@ -7,6 +7,9 @@
     :per-page="perPage"
     :total="total"
     @update:page="emit('update:page', $event)"
+    @update:perPage="emit('update:perPage', $event)"
+    :selectable="true"
+    @update:selected="emit('update:selected', $event)"
   >
     <template #cell-student="{ item }">
       <div class="flex items-center space-x-4">
@@ -68,14 +71,14 @@
     <template #cell-suggestion="{ item }">
     <div class="max-w-md">
       <p
-        class="text-sm"
-        :class="expanded[item.id] ? '' : 'line-clamp-2'"
+        class="text-sm leading-relaxed whitespace-pre-wrap wrap-break-word"
+        :class="expanded[item.id] ? 'line-clamp-3' : ''"
       >
         {{ item.suggestion }}
       </p>
 
       <button
-        v-if="item.suggestion.length > 120"
+        v-if="item.suggestion.length > 150"
         class="text-xs text-primary mt-1 hover:underline"
         @click="toggle(item.id)"
       >
@@ -88,7 +91,7 @@
 
 <script setup lang="ts">
 import { reactive } from 'vue'
-import type { Suggestion } from '@/services/formService'
+import type { Suggestion } from '@/services/forms'
 import BaseTable, { type Column } from '../BaseTable.vue'
 import { IconUser } from '@tabler/icons-vue'
 
@@ -104,6 +107,7 @@ defineProps<{
 const emit = defineEmits<{
   (e: 'update:page', value: number): void
   (e: 'update:perPage', value: number): void
+  (e: 'update:selected', items: Suggestion[]): void
 }>()
 
 const getInitials = (email: string | null | undefined) => {

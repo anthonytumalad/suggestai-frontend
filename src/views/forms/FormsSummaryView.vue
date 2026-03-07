@@ -1,168 +1,281 @@
-<!-- pages/TopicSessionsPage.vue -->
 <template>
-  <div class="container mx-auto p-6">
-    <div class="mb-6 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-bold">Topic Analysis Sessions</h1>
-        <p class="text-text-muted">View and manage your topic modeling sessions</p>
+  <div class="flex flex-col space-y-8">
+    <BaseAlert
+      v-if="isError"
+      severity="error"
+      title="Failed to load sessions"
+      :message="sessionError?.message ?? 'An unexpected error occurred.'"
+      :closable="false"
+    />
+    <BaseAlert
+      v-if="reportSuccess"
+      severity="success"
+      title="Report queued"
+      message="Your report is being generated and will be available shortly."
+      @close="reportSuccess = false"
+    />
+    <BaseAlert
+      v-if="reportError"
+      severity="error"
+      title="Failed to generate report"
+      :message="reportError"
+      @close="reportError = null"
+    />
+    <div class="flex flex-col space-y-4">
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+
+          <div class="flex items-center gap-2">
+            <BaseSearch
+              placeholder="Search sessions..."
+              @update:modelValue="search = $event"
+            />
+
+            <BaseDropdown align="left" width="auto">
+              <template #trigger="{ open }">
+                <BaseButton variant="outline" size="sm">
+                  <IconFilter class="mr-2 h-4 w-4" />
+                  {{ selectedStatus ?? 'All Status' }}
+                  <IconChevronDown
+                    class="ml-2 h-4 w-4 transition-transform duration-150"
+                    :class="{ 'rotate-180': open }"
+                  />
+                </BaseButton>
+              </template>
+              <template #default="{ close }">
+                <DropdownItem label="All Status" @click="() => { selectedStatus = null; close() }" />
+                <DropdownItem label="Completed" @click="() => { selectedStatus = 'completed'; close() }" />
+                <DropdownItem label="Pending" @click="() => { selectedStatus = 'pending'; close() }" />
+                <DropdownItem label="Failed" @click="() => { selectedStatus = 'failed'; close() }" />
+              </template>
+            </BaseDropdown>
+
+            <BaseDropdown align="left" width="auto">
+              <template #trigger="{ open }">
+                <BaseButton variant="outline" size="sm">
+                  <IconTopologyStar class="mr-2 h-4 w-4" />
+                  {{ selectedTopics ?? 'Any Topics' }}
+                  <IconChevronDown
+                    class="ml-2 h-4 w-4 transition-transform duration-150"
+                    :class="{ 'rotate-180': open }"
+                  />
+                </BaseButton>
+              </template>
+              <template #default="{ close }">
+                <DropdownItem label="Any Topics" @click="() => { selectedTopics = null; close() }" />
+                <DropdownItem label="1–5 topics" @click="() => { selectedTopics = '1-5'; close() }" />
+                <DropdownItem label="6–15 topics" @click="() => { selectedTopics = '6-15'; close() }" />
+                <DropdownItem label="15+ topics" @click="() => { selectedTopics = '15+'; close() }" />
+              </template>
+            </BaseDropdown>
+
+            <BaseDropdown align="left" width="auto">
+              <template #trigger="{ open }">
+                <BaseButton variant="outline" size="sm">
+                  <IconArrowsSort class="mr-2 h-4 w-4" />
+                  {{ selectedSort ?? 'Sort by' }}
+                  <IconChevronDown
+                    class="ml-2 h-4 w-4 transition-transform duration-150"
+                    :class="{ 'rotate-180': open }"
+                  />
+                </BaseButton>
+              </template>
+              <template #default="{ close }">
+                <DropdownItem label="Newest first" @click="() => { selectedSort = 'newest'; close() }" />
+                <DropdownItem label="Oldest first" @click="() => { selectedSort = 'oldest'; close() }" />
+                <DropdownItem label="Most topics" @click="() => { selectedSort = 'topics_desc'; close() }" />
+                <DropdownItem label="Most suggestions" @click="() => { selectedSort = 'suggestions_desc'; close() }" />
+                <DropdownItem label="Most outliers" @click="() => { selectedSort = 'outliers_desc'; close() }" />
+              </template>
+            </BaseDropdown>
+
+            <button
+              v-if="hasActiveFilters"
+              class="text-xs text-text-muted hover:text-primary transition-colors duration-150 cursor-pointer"
+              @click="clearFilters"
+            >
+              Clear filters
+            </button>
+          </div>
+
+          <div class="w-px h-5 bg-border-muted shrink-0" />
+
+          <div class="flex items-center gap-2">
+            <template v-if="selectedCount > 0">
+              <span class="text-sm text-text-muted">
+                <span class="font-medium text-text-base">{{ selectedCount }}</span>
+                {{ selectedCount === 1 ? 'row' : 'rows' }} selected
+              </span>
+            </template>
+            <BaseButton
+              variant="danger"
+              size="sm"
+              :icon="IconTrash"
+              label="Delete"
+              :disabled="selectedCount === 0"
+            />
+            <BaseDropdown align="left" width="auto">
+              <template #trigger="{ open }">
+                <BaseButton
+                  variant="primary"
+                  size="sm"
+                  :icon="IconReportAnalytics"
+                  :disabled="selectedCount !== 1 || isCreating"
+                  :loading="isCreating"
+                >
+                  Generate Report
+                  <IconChevronDown class="ml-2 h-4 w-4 transition-transform duration-150" :class="{ 'rotate-180': open }" />
+                </BaseButton>
+              </template>
+              <template #default="{ close }">
+                <DropdownItem
+                  label="Export as PDF"
+                  :icon="IconFileTypePdf"
+                  @click="() => { handleGenerateReport('pdf');  close() }"
+                />
+                <DropdownItem
+                  label="Export as CSV"
+                  :icon="IconFileTypeCsv"
+                  @click="() => { handleGenerateReport('csv');  close() }"
+                />
+                <DropdownItem
+                  label="Export as Excel"
+                  :icon="IconFileSpreadsheet"
+                  @click="() => { handleGenerateReport('xlsx'); close() }"
+                />
+              </template>
+            </BaseDropdown>
+          </div>
+
+        </div>
+        <BaseButton
+          variant="outline"
+          :icon="IconRefresh"
+          size="sm"
+          @click="$emit('refresh')"
+        />
       </div>
+
+      <div class="bg-bg-primary p-6 rounded border border-border-muted">
+        <TopicSessionTable
+          :sessions="paginatedSessions"
+          :columns="columns"
+          :query="{ isLoading, isFetching }"
+          :page="page"
+          :per-page="perPage"
+          :total="total"
+          @update:page="page = $event"
+          @update:per-page="perPage = $event"
+          @row-click="handleRowClick"
+          @update:selected="selectedSessions = $event"
+        />
+      </div>
+
     </div>
-
-    <BaseTable
-      :columns="columns"
-      :items="paginatedSessions"
-      :query="sessionsQuery"
-      :page="page"
-      :per-page="perPage"
-      :total="total"
-      @update:page="page = $event"
-      @update:per-page="perPage = $event"
-      @row-click="handleRowClick"
-      @sort="handleSort"
-    >
-      <!-- Custom slot for date range -->
-      <template #cell-date_range="{ item }">
-        <div class="text-sm">
-          {{ formatDateRange(item) }}
-        </div>
-      </template>
-
-      <!-- Custom slot for topics -->
-      <template #cell-total_topics="{ item }">
-        <div class="flex items-center gap-2">
-          <span>{{ item.total_topics }}</span>
-          <span class="text-xs text-text-muted">({{ item.outliers }} outliers)</span>
-        </div>
-      </template>
-
-      <!-- Custom slot for status/duplicate indicator -->
-      <template #cell-status="{ item }">
-        <div class="flex items-center gap-2">
-          <span
-            v-if="hasDuplicates(item)"
-            class="inline-flex items-center px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800"
-            title="Duplicate date range detected"
-          >
-            ⚠️ Duplicate
-          </span>
-          <span
-            v-else
-            class="inline-flex items-center px-2 py-1 rounded text-xs bg-green-100 text-green-800"
-          >
-            ✓ Unique
-          </span>
-        </div>
-      </template>
-
-      <!-- Custom slot for created_at -->
-      <template #cell-created_at="{ item }">
-        <div class="text-sm">
-          {{ formatDate(item.created_at) }}
-        </div>
-      </template>
-
-      <!-- Custom slot for actions -->
-      <template #cell-actions="{ item }">
-        <div class="flex gap-2" @click.stop>
-          <button
-            @click="viewSession(item.id)"
-            class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            View
-          </button>
-          <button
-            @click="confirmDelete(item)"
-            :disabled="isDeletingSession"
-            class="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
-          >
-            Delete
-          </button>
-        </div>
-      </template>
-    </BaseTable>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import BaseTable, { type Column } from '@/components/base/table/BaseTable.vue'
-import { useTopicSessions } from '@/composables/forms/useTopicSessions'
-import type { TopicSession } from '@/services/formService'
+import {
+  IconTrash, IconReportAnalytics, IconChevronDown,
+  IconArrowsSort, IconFilter, IconTopologyStar, IconRefresh,
+  IconFileTypePdf, IconFileTypeCsv, IconFileSpreadsheet,
+} from '@tabler/icons-vue'
+import { useReports } from '@/composables/reports/useReport'
+import TopicSessionTable, { type SessionItem } from '@/components/base/table/forms/TopicSessionTable.vue'
+import type { Column } from '@/components/base/table/BaseTable.vue'
+import { useTopicSessions, type SortOption, type TopicsRange } from '@/composables/forms/useTopicSessions'
 
 const route = useRoute()
 const router = useRouter()
 
-const formId = computed(() => Number(route.params.formId))
+const formId = parseInt(route.params.id as string)
 const page = ref(1)
 const perPage = ref(15)
+const search = ref('')
+
+const selectedStatus = ref<string | null>(null)
+const selectedTopics = ref<TopicsRange | null>(null)
+const selectedSort   = ref<SortOption | null>(null)
+const selectedSessions = ref<SessionItem[]>([])
+const selectedCount = computed(() => selectedSessions.value.length)
+const selectedSession = computed(() => selectedSessions.value[0] ?? null)
+
+const reportSuccess = ref(false)
+const reportError   = ref<string | null>(null)
+
+watch([search, selectedStatus, selectedTopics, selectedSort], () => {
+  page.value = 1
+})
+
+const hasActiveFilters = computed(() =>
+  !!(selectedStatus.value || selectedTopics.value || selectedSort.value)
+)
+
+const clearFilters = () => {
+  selectedStatus.value = null
+  selectedTopics.value = null
+  selectedSort.value = null
+}
 
 const {
-  sessionsQuery,
   paginatedSessions,
   total,
-  hasDuplicates,
-  deleteSession,
-  isDeletingSession,
-} = useTopicSessions({ formId, page, perPage })
+  isLoading,
+  isFetching,
+  isError,
+  sessionError,
+} = useTopicSessions({
+  formId,
+  page,
+  perPage,
+  search,
+  selectedStatus,
+  selectedTopics,
+  selectedSort
+})
 
-const columns: Column<TopicSession>[] = [
-  { key: 'id', label: 'ID', sortable: true },
-  { key: 'name', label: 'Session Name', sortable: true },
-  { key: 'date_range', label: 'Date Range', slot: true },
-  { key: 'total_topics', label: 'Topics', slot: true, sortable: true },
-  { key: 'total_documents', label: 'Documents', sortable: true },
-  { key: 'created_at', label: 'Created', slot: true, sortable: true },
-  { key: 'status', label: 'Status', slot: true },
-  { key: 'actions', label: 'Actions', slot: true },
+const { createReport, isCreating } = useReports()
+
+const columns: Column<SessionItem>[] = [
+  { key: 'id', label: '#', sortable: false },
+  { key: 'name', label: 'Name', sortable: false },
+  { key: 'date_range', label: 'Date Range', slot: true, sortable: false },
+  { key: 'total_topics', label: 'Topics', sortable: false },
+  { key: 'total_documents', label: 'Suggestions', sortable: false },
+  { key: 'outliers', label: 'Outliers', sortable: false },
+  { key: 'status', label: 'Status', slot: true, sortable: false },
+  { key: 'created_at', label: 'Created', slot: true, sortable: true }
 ]
 
-const formatDateRange = (session: TopicSession) => {
-  const range = session.model_parameters?.date_range
-  if (!range?.start && !range?.end) return 'All time'
-
-  const start = range.start ? new Date(range.start).toLocaleDateString() : 'Start'
-  const end = range.end ? new Date(range.end).toLocaleDateString() : 'End'
-
-  return `${start} – ${end}`
-}
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
-  const diffDays = Math.floor(diffMs / 86400000)
-
-  if (diffMins < 60) return `${diffMins} minutes ago`
-  if (diffHours < 24) return `${diffHours} hours ago`
-  if (diffDays < 7) return `${diffDays} days ago`
-
-  return date.toLocaleDateString()
-}
-
-const handleRowClick = (session: TopicSession) => {
-  viewSession(session.id)
-}
-
-const viewSession = (sessionId: number) => {
+const handleRowClick = (session: SessionItem) => {
   router.push({
-    name: 'TopicSessionDetails',
-    params: { formId: formId.value, sessionId }
+    name: 'formOverview',
+    params: { id: formId },
+    query: { sessionId: String(session.id) },
   })
 }
 
-const confirmDelete = async (session: TopicSession) => {
+const handleGenerateReport = async (format: 'pdf' | 'csv' | 'xlsx') => {
+  if (!selectedSession.value) return
+
+  reportSuccess.value = false
+  reportError.value   = null
+
   try {
-    await deleteSession(session.id)
-  } catch (error) {
-    console.error('Failed to delete session:', error)
+    await createReport({
+      topic_session_id: selectedSession.value.id,
+      format,
+    })
+    reportSuccess.value = true
+  } catch (err) {
+    reportError.value = err instanceof Error
+      ? err.message
+      : 'Something went wrong.'
   }
 }
-
-const handleSort = (payload: { key: string; direction: 'asc' | 'desc' | null }) => {
-  console.log('Sort:', payload)
-  // Implement sorting logic if needed
-}
 </script>
+

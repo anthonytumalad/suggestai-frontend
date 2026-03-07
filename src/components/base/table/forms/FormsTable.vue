@@ -9,6 +9,8 @@
     @update:page="emit('update:page', $event)"
     @update:per-page="emit('update:perPage', $event)"
     @row-click="emit('row-click', $event)"
+    :selectable="true"
+    @update:selected="emit('update:selected', $event)"
   >
     <template #cell-title="{ item }">
       <span
@@ -56,5 +58,6 @@ const emit = defineEmits < {
   'update:page': [page: number]
   'update:perPage': [perPage: number]
   'row-click': [item: FormItems]
+  'update:selected': [items: FormItems[]]
 }>()
 </script>

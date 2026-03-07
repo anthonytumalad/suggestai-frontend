@@ -5,7 +5,7 @@ import {
   authService,
   type AuthenticationError,
   type SigninCredentials,
-} from '@/services/authService'
+} from '@/services/auth'
 
 export const AUTH_QUERY_KEYS = {
   user: ['auth', 'user'] as const,
@@ -20,11 +20,13 @@ export function useAuth() {
     queryFn: () => authService.getCurrentUser(),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
-    retry: (failureCount, error) => (error as AuthenticationError).statusCode !== 401 && failureCount < 2,
+    retry: (failureCount, error) =>
+      (error as AuthenticationError).statusCode !== 401 && failureCount < 2,
   })
 
   const signInMutation = useMutation({
-    mutationFn: (credentials: SigninCredentials) => withMinDelay(authService.authenticate(credentials)),
+    mutationFn: (credentials: SigninCredentials) =>
+      withMinDelay(authService.authenticate(credentials)),
     onSuccess: async (data) => {
       queryClient.setQueryData(AUTH_QUERY_KEYS.user, data.user)
       await userQuery.refetch()
@@ -36,24 +38,20 @@ export function useAuth() {
 
   const signOutMutation = useMutation({
     mutationFn: () => authService.signout(),
-    onSettled: () => {
-      queryClient.clear()
-    },
+    onSettled: () => queryClient.clear(),
   })
 
   const signOutAllMutation = useMutation({
-    mutationFn: () => authService.signoutAll(),
-    onSettled: () => {
-      queryClient.clear()
-    },
+    mutationFn: () => authService.signout(true),
+    onSettled: () => queryClient.clear(),
   })
 
-  const isAuthenticated = computed(() =>
-    authService.isAuthenticated() && !!userQuery.data.value
+  const isAuthenticated = computed(
+    () => authService.isAuthenticated() && !!userQuery.data.value
   )
 
-  const isLoading = computed(() =>
-    userQuery.isLoading.value || signInMutation.isPending.value
+  const isLoading = computed(
+    () => userQuery.isLoading.value || signInMutation.isPending.value
   )
 
   return {
@@ -74,6 +72,7 @@ export function useAuth() {
     isSigningOutAll: signOutAllMutation.isPending,
 
     refetchUser: userQuery.refetch,
-    invalidateUser: () => queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user }),
+    invalidateUser: () =>
+      queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEYS.user }),
   }
 }
