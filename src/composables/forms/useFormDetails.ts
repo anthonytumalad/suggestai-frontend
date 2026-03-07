@@ -1,25 +1,25 @@
 import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import { FormService, type Form } from '@/services/formService'
+import { formService } from '@/services/forms'
+import type { Form } from '@/services/forms'
+
+export const FORM_QUERY_KEYS = {
+  detail: (formId: number) => ['forms', formId] as const,
+}
 
 export function useFormDetails(formId: number) {
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: ['form', formId],
-    queryFn: () => FormService.show(formId),
-    enabled: !!formId,
+    queryKey: FORM_QUERY_KEYS.detail(formId),
+    queryFn:  () => formService.show(formId),
+    enabled:  !!formId,
   })
 
-  const form = computed<Form | undefined>(() => data.value?.data)
-
   return {
-    form,
-    data,
-
+    form:       computed<Form | undefined>(() => data.value?.data),
     isLoading,
-    isError,
     isFetching,
+    isError,
     error,
-
     refetch,
   }
 }

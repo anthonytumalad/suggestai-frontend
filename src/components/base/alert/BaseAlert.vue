@@ -17,7 +17,7 @@
         <div class="flex-1">
           <span
             v-if="title"
-            class="block text-base"
+            class="block text-sm py-1"
           >
             {{ title }}
           </span>

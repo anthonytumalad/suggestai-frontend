@@ -1,34 +1,49 @@
 <template>
   <header>
-    <div class="flex h-16 items-center justify-between px-6">
-      <!-- Left Section -->
-      <div class="flex items-center space-x-34">
-        <div class="flex items-center space-x-4">
-          <button
-            @click="$emit('toggle-sidebar')"
-            class="cursor-pointer rounded p-2 transition-all duration-300 bg-bg-primary border border-border-muted"
-          >
-            <IconMenu3 class="h-5 w-5 text-text-muted" />
-          </button>
+    <div class="flex h-16 items-center justify-between px-6 border-b border-border-muted">
 
-          <BaseBreadcrumb />
-        </div>
+      <div class="flex items-center space-x-10">
+        <button
+          @click="$emit('toggle-sidebar')"
+          class="cursor-pointer rounded p-2 transition-all duration-300 bg-bg-primary border border-border-muted"
+        >
+          <IconMenu3 class="h-5 w-5 text-text-muted" />
+        </button>
+
+        <nav class="flex items-center space-x-2 text-sm">
+          <router-link
+            v-for="(crumb, index) in breadcrumbs"
+            :key="index"
+            :to="crumb.to"
+            class="flex items-center space-x-2 group"
+          >
+            <span
+              class="transition-colors duration-200"
+              :class="
+                index === breadcrumbs.length - 1
+                  ? 'text-text-base font-medium'
+                  : 'text-text-muted hover:text-primary'
+              "
+            >
+              {{ crumb.label }}
+            </span>
+
+            <IconChevronRight
+              v-if="index < breadcrumbs.length - 1"
+              class="w-4 h-4 text-text-muted"
+            />
+          </router-link>
+        </nav>
       </div>
 
-      <!-- Right Section (Profile + Dropdown) -->
       <div class="relative">
         <button
           @click="toggleDropdown"
           class="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border-muted transition hover:ring-2 hover:ring-primary cursor-pointer"
         >
-          <img
-            src="https://picsum.photos/200"
-            alt="Profile"
-            class="h-full w-full object-cover"
-          />
+          <IconUser class="h-5 w-5 text-text-muted" />
         </button>
 
-        <!-- Dropdown -->
         <Transition
           enter-active-class="transition ease-out duration-100"
           enter-from-class="transform scale-95 opacity-0"
@@ -56,36 +71,32 @@
           </div>
         </Transition>
       </div>
+
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-/* -----------------------------
- * Imports
- * ----------------------------- */
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { RouteLocationRaw } from 'vue-router'
 
 import {
   IconMenu3,
   IconLogout,
+  IconUser,
+  IconChevronRight
 } from '@tabler/icons-vue'
 
-import BaseBreadcrumb from './base/breadcrumb/BaseBreadcrumb.vue'
 import { useAuth } from '@/composables/auth/useAuth'
 
-/* -----------------------------
- * State & Composables
- * ----------------------------- */
 const router = useRouter()
+const route = useRoute()
+
 const { signOut, isSigningOut } = useAuth()
 
 const isDropdownOpen = ref(false)
 
-/* -----------------------------
- * Methods
- * ----------------------------- */
 const toggleDropdown = (): void => {
   isDropdownOpen.value = !isDropdownOpen.value
 }
@@ -108,14 +119,84 @@ const handleClickOutside = (event: MouseEvent): void => {
   }
 }
 
-/* -----------------------------
- * Lifecycle
- * ----------------------------- */
-onMounted(() => {
+onMounted(() =>
   document.addEventListener('click', handleClickOutside)
-})
+)
 
-onBeforeUnmount(() => {
+onBeforeUnmount(() =>
   document.removeEventListener('click', handleClickOutside)
+)
+
+interface Breadcrumb {
+  label: string
+  to: RouteLocationRaw
+}
+
+const breadcrumbs = computed((): Breadcrumb[] => {
+  const crumbs: Breadcrumb[] = [
+    { label: 'Home', to: { name: 'dashboard' } }
+  ]
+
+  if (route.name === 'forms' || route.name === 'addForm') {
+    crumbs.push({ label: 'Forms', to: { name: 'forms' } })
+
+    if (route.name === 'addForm') {
+      crumbs.push({ label: 'Add Form', to: { name: 'addForm' } })
+    }
+  }
+
+  if (route.params.id) {
+    const formTitle = (route.query.title as string) || 'Form'
+
+    crumbs.push({ label: 'Forms', to: { name: 'forms' } })
+
+    crumbs.push({
+      label: formTitle,
+      to: {
+        name: '',
+        params: { id: route.params.id },
+        query: { title: formTitle }
+      }
+    })
+
+    if (route.name === 'formSuggestions') {
+      crumbs.push({
+        label: 'Suggestions',
+        to: {
+          name: 'formSuggestions',
+          params: { id: route.params.id },
+          query: { title: formTitle }
+        }
+      })
+    } else if (route.name === 'formSummary') {
+      crumbs.push({
+        label: 'Summary',
+        to: {
+          name: 'formSummary',
+          params: { id: route.params.id },
+          query: { title: formTitle }
+        }
+      })
+    } else if (route.name === 'formOverview') {
+      crumbs.push({
+        label: 'Overview',
+        to: {
+          name: 'formOverview',
+          params: { id: route.params.id },
+          query: { title: formTitle }
+        }
+      })
+    }
+  }
+
+  if (route.name === 'reports') {
+    crumbs.push({ label: 'Reports', to: { name: 'reports' } })
+  }
+
+  if (route.name === 'trash') {
+    crumbs.push({ label: 'Trash', to: { name: 'trash' } })
+  }
+
+  return crumbs
 })
 </script>

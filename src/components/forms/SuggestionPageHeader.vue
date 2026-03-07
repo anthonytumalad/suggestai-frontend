@@ -1,33 +1,32 @@
 <template>
-  <div class="flex items-center justify-between pb-4">
-    <h1 class="text-3xl font-medium text-text-base">
-      {{ title }}
-    </h1>
-    <div class="flex items-center space-x-2">
-      <BaseButton
-        variant="outline"
-        :icon="IconQrcode"
-        size="sm"
-        @click="showQrDialog = true"
-      />
-      <BaseButton
-        variant="outline"
-        :icon="IconDownload"
-        size="sm"
-        @click="$emit('download')"
-      />
-      <BaseButton
-        variant="outline"
-        :icon="IconEdit"
-        size="sm"
-        @click="$emit('edit')"
-      />
-      <BaseButton
-        variant="outline"
-        :icon="IconTrashX"
-        size="sm"
-        @click="$emit('delete')"
-      />
+  <div class="flex items-center justify-between pb-6">
+    <div>
+      <h1 class="text-4xl font-medium text-text-base mb-2">
+        {{ title }}
+      </h1>
+      <div class="flex items-center space-x-4 text-text-muted text-sm">
+        <button
+          class="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer"
+          @click="showQrDialog = true"
+        >
+          <IconQrcode class="w-4 h-4" />
+          Share
+        </button>
+        <button
+          class="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer"
+          @click="$emit('edit')"
+        >
+          <IconEdit class="w-4 h-4" />
+          Edit
+        </button>
+        <button
+          class="flex items-center gap-1 hover:text-red-500 transition-colors cursor-pointer"
+          @click="$emit('delete')"
+        >
+          <IconTrashX class="w-4 h-4" />
+          Delete
+        </button>
+      </div>
     </div>
   </div>
 

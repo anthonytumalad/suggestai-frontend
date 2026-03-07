@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { authService } from '@/services/authService'
-import FormLayout from '@/layouts/FormLayout.vue'
+import { authService } from '@/services/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,9 +28,23 @@ const router = createRouter({
           meta: { title: 'Forms' }
         },
         {
+          path: 'forms/add',
+          name: 'addForm',
+          component: () => import('@/views/forms/FormsAddView.vue'),
+          meta: { title: 'Add Form' }
+        },
+        {
           path: 'forms/:id',
           component: () => import('@/layouts/FormLayout.vue'),
           children: [
+            {
+              path: '',
+              redirect: to => ({
+                name: 'formOverview',
+                params: { id: to.params.id },
+                query: to.query,
+              }),
+            },
             {
               path: 'suggestions',
               name: 'formSuggestions',
@@ -43,6 +56,12 @@ const router = createRouter({
               name: 'formSummary',
               component: () => import('@/views/forms/FormsSummaryView.vue'),
               meta: { title: 'Summary' }
+            },
+            {
+              path: 'overview',
+              name: 'formOverview',
+              component: () => import('@/views/forms/FormsOverview.vue'),
+              meta: { title: 'Overview' }
             }
           ]
         },
@@ -74,28 +93,20 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const isAuthenticated = authService.isAuthenticated()
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-  const isGuestOnly = to.matched.some(record => record.meta.guest)
+  const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
+  const isGuestOnly = to.matched.some(r => r.meta.guest)
 
-  if (to.meta.title) {
-    document.title = `${to.meta.title} | TLC-SUGGEST`
-  } else {
-    document.title = 'TLC-SUGGEST'
-  }
+  document.title = to.meta.title
+    ? `${to.meta.title} | TLC-SUGGEST`
+    : 'TLC-SUGGEST'
 
   if (requiresAuth && !isAuthenticated) {
-    next({
-      name: 'SignIn',
-      query: { redirect: to.fullPath }
-    })
-  }
-  else if (isGuestOnly && isAuthenticated) {
-    const redirectPath = (to.query.redirect as string) || '/'
-    next(redirectPath)
-  }
-  else {
+    next({ name: 'SignIn', query: { redirect: to.fullPath } })
+  } else if (isGuestOnly && isAuthenticated) {
+    next((to.query.redirect as string) || '/')
+  } else {
     next()
   }
 })
