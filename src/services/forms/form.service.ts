@@ -41,8 +41,30 @@ export const formService = {
     const { data } = await api.post<{ message: string; data: Form }>(
       apiEndpoints.forms.store,
       payload,
-      { headers: { 'Content-Type': 'multipart/form-data' } }
+      {
+        headers: {
+          'Content-Type': undefined
+        }
+      }
     )
+    return data
+  },
+
+  async update(formId: number, payload: FormData): Promise<{ message: string; data: Form }> {
+    const { data } = await api.put<{ message: string; data: Form }>(
+      apiEndpoints.forms.update(formId),
+      payload,
+      {
+        headers: {
+          'Content-Type': undefined
+        }
+      }
+    )
+    return data
+  },
+
+  async destroy(formId: number): Promise<{ message: string }> {
+    const { data } = await api.delete<{ message: string }>(apiEndpoints.forms.destroy(formId))
     return data
   },
 

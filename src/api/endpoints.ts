@@ -9,6 +9,8 @@ export const apiEndpoints = {
     index: '/forms',
     store: '/forms',
     show: (formId: number) => `/forms/${formId}`,
+    update: (formId: number) => `/forms/${formId}`,
+    destroy: (formId: number) => `/forms/${formId}`,
 
     suggestions: (formId: number) => `/forms/${formId}/suggestions`,
 

@@ -47,12 +47,12 @@
         </div>
       </div>
 
-    <div
+    <BaseAlert
       v-if="!sessions.length && !isLoadingSessions"
-      class="bg-bg-primary rounded border border-border-muted px-6 py-16 text-center text-sm text-text-muted"
-    >
-      No sessions found. Generate a summary from the Suggestions tab first.
-    </div>
+      severity="warn"
+      message="No sessions found. Generate a summary from the Suggestions tab first."
+      :closable="false"
+    />
 
     <div
       v-else-if="!selectedSessionId"

@@ -198,7 +198,7 @@ const timelineOptions = computed(() => ({
       opacityTo: 0
     }
   },
-  colors: ['#6366f1'],
+  colors: ['#0EA5E9'],
   xaxis: {
     type: 'datetime',
     labels: {
@@ -223,7 +223,7 @@ const donutSeries = computed(() => [
 const donutOptions = computed(() => ({
   chart: { background: 'transparent' },
   labels: ['Anonymous', 'Identified'],
-  colors: ['#e5e7eb', '#6366f1'],
+  colors: ['#e5e7eb', '#0EA5E9'],
   legend: {
     position: 'bottom',
     labels: { colors: '#6b7280' }
@@ -263,7 +263,7 @@ const barOptions = computed(() => ({
     background: 'transparent',
     toolbar: { show: false }
   },
-  colors: ['#6366f1'],
+  colors: ['#0EA5E9'],
   xaxis: {
     categories: perForm.value.map((f: { title: string }) =>
       f.title.length > 16

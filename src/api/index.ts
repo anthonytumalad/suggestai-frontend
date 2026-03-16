@@ -26,6 +26,9 @@ const api: AxiosInstance = axios.create(API_CONFIG)
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
     const token = getToken()
+    console.log('Token from storage:', token)
+    console.log('Request URL:', config.url)
+    console.log(import.meta.env.VITE_API_URL)
 
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
@@ -70,6 +73,7 @@ api.interceptors.response.use(
 
       case 422:
         console.error('Validation Error:', error.response.data)
+        console.error('Full errors:', JSON.stringify(error.response.data.errors, null, 2))
         break
 
       case 500:

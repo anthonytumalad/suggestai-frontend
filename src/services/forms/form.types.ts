@@ -21,6 +21,7 @@ export interface Form {
   suggestions_count?: number
   url: string
   qr_code_url: string
+  img_url: string
 }
 
 export interface CreateFormParams {
