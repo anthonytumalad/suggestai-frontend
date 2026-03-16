@@ -212,10 +212,17 @@ const handleSave = async () => {
 
   try {
     const payload = new FormData()
-    payload.append('name', form.name)
+    payload.append('title', form.name)
     if (form.description) payload.append('description', form.description)
-    payload.append('is_active', String(form.is_active))
+    payload.append('is_active', form.is_active ? '1' : '0')
     if (imageFile.value) payload.append('img', imageFile.value)
+    console.log('img file:', imageFile.value)
+    console.log('img type:', imageFile.value?.type)
+
+    for (const [key, value] of payload.entries()) {
+      console.log(key, ':', value)
+    }
+
 
     await createFormAsync(payload)
 

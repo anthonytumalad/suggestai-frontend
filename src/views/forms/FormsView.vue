@@ -9,6 +9,14 @@
         class="mb-4"
       />
 
+      <BaseAlert
+        v-if="alertMessage"
+        :severity="alertSeverity"
+        :message="alertMessage"
+        :closable="true"
+        @close="alertMessage = null"
+      />
+
       <div class="flex flex-col space-y-4">
 
         <!-- Toolbar -->
@@ -24,7 +32,13 @@
               leave-to-class="opacity-0 -translate-y-1"
             >
               <div v-if="selectedForms.length === 0" class="flex items-center gap-2">
-                <BaseButton variant="primary" :icon="IconPlus" size="sm" label="Add" @click="openModal" />
+                <BaseButton
+                  variant="primary"
+                  :icon="IconPlus"
+                  size="sm"
+                  label="Add"
+                  @click="openModal"
+                />
               </div>
               <div v-else class="flex items-center gap-3">
                 <span class="text-sm text-text-muted">
@@ -38,6 +52,8 @@
                   size="sm"
                   label="Delete"
                   class="hover:text-red-500"
+                  :disabled="isDeleting"
+                  :loading="isDeleting"
                   @click="handleDeleteSelected"
                 />
               </div>
@@ -179,6 +195,39 @@
         <BaseButton variant="primary" size="sm" label="Add Form" @click="handleSave" />
       </template>
     </BaseDialog>
+
+    <BaseDialog
+      v-model="showDeleteConfirm"
+      title="Delete Forms"
+      size="sm"
+      :show-close="true"
+      :close-on-backdrop="true"
+      :close-on-escape="true"
+    >
+      <p class="text-sm text-text-base">
+        Are you sure you want to delete
+        <span class="font-medium">{{ selectedForms.length }}</span>
+        {{ selectedForms.length === 1 ? 'form' : 'forms' }}?
+        This action cannot be undone.
+      </p>
+
+      <template #footer>
+        <BaseButton
+          variant="outline"
+          size="sm"
+          label="Cancel"
+          @click="showDeleteConfirm = false"
+        />
+        <BaseButton
+          variant="danger"
+          size="sm"
+          label="Delete"
+          :loading="isDeleting"
+          :disabled="isDeleting"
+          @click="confirmDelete"
+        />
+      </template>
+    </BaseDialog>
   </div>
 </template>
 
@@ -207,6 +256,8 @@ const {
   sortOption,
   hasActiveFilters,
   clearFilters,
+  deleteFormAsync,
+  isDeleting
 } = useForms({ page: 1, perPage: 15 })
 
 const statusLabels = {
@@ -233,6 +284,10 @@ const selectedForms = ref<FormItem[]>([])
 
 const form   = reactive({ name: '', description: '', is_active: true })
 const errors = reactive({ name: '' })
+
+const alertMessage  = ref<string | null>(null)
+const alertSeverity = ref<'success' | 'error'>('success')
+const showDeleteConfirm = ref(false)
 
 const openModal = () => router.push({ name: 'addForm' })
 
@@ -262,8 +317,21 @@ const handleSave = () => {
   resetForm()
 }
 
-const handleDeleteSelected = async () => {
-  console.log('delete:', selectedForms.value.map(f => f.id))
-  selectedForms.value = []
+const handleDeleteSelected = () => {
+  if (!selectedForms.value.length) return
+  showDeleteConfirm.value = true
+}
+
+const confirmDelete = async () => {
+  showDeleteConfirm.value = false
+  try {
+    await Promise.all(selectedForms.value.map(f => deleteFormAsync(f.id)))
+    alertSeverity.value = 'success'
+    alertMessage.value  = `${selectedForms.value.length} form${selectedForms.value.length > 1 ? 's' : ''} deleted successfully.`
+    selectedForms.value = []
+  } catch {
+    alertSeverity.value = 'error'
+    alertMessage.value  = 'Failed to delete selected forms.'
+  }
 }
 </script>
